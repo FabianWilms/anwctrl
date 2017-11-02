@@ -1,0 +1,74 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/paper-styles/default-theme.html">
+<link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
+<link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../bower_components/neon-animation/web-animations.html">
+<link rel="import" href="../../bower_components/polymerfire/firebase-app.html">
+<link rel="import" href="../../bower_components/polymerfire/firebase-document.html">
+
+<link rel="import" href="../../styles/app-theme.html">
+<link rel="import" href="../anw-single/anw-single.html">
+
+
+<dom-module id="anwctrl-app">
+    <template>
+        <style>
+             :host {
+                display: block;
+            }
+
+            .legend paper-card {
+                margin: 8px;
+            }
+
+            .loading {
+                height: 100%;
+            }
+        </style>
+
+        <style include="iron-flex iron-flex-alignment"></style>
+
+        <firebase-app auth-domain="anwctrl.firebaseapp.com" database-url="https://anwesenheit-550a6.firebaseio.com" api-key="AIzaSyCMOpqIHJ0QG5LddQ-DzCQ7bG6RJaZsKHQ"
+            project-id="anwesenheit-550a6" storage-bucket="anwesenheit-550a6.appspot.com">
+        </firebase-app>
+
+        <firebase-document path="anwesenheiten" data="{{anwesenheiten}}">
+        </firebase-document>
+
+        <paper-dropdown-menu>
+            <paper-menu attr-for-selected="value" selected="{{selectedUser}}">
+                <template is="dom-repeat" items="[[anwesenheiten.entries()]]">
+                    <paper-item value$="{{item.value}}">{{item.key}}</paper-item>
+                </template>
+            </paper-menu>
+        </paper-dropdown-menu>
+
+        <div class="layout horizontal wrap">
+
+            <anw-single person={{selectedUser}}>
+            </anw-single>
+
+        </div>
+    </template>
+
+    <script>
+        /**
+     * @customElement
+     * @polymer
+     */
+        class AnwctrlApp extends Polymer.Element {
+            static get is() { return 'anwctrl-app'; }
+            static get properties() {
+                return {
+                    anwesenheiten: {
+                        type: Object
+                    }
+                };
+            }
+        }
+
+
+        window.customElements.define(AnwctrlApp.is, AnwctrlApp);
+    </script>
+</dom-module>
