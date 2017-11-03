@@ -1,6 +1,7 @@
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
 <link rel="import" href="../../bower_components/paper-styles/default-theme.html">
 <link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../../bower_components/neon-animation/web-animations.html">
@@ -35,20 +36,18 @@
 
         <firebase-document path="anwesenheiten" data="{{anwesenheiten}}">
         </firebase-document>
-        
-        <anw-single person={{anwesenheiten.sebastian}}></anw-single>
 
-        <paper-dropdown-menu>
-            <paper-menu attr-for-selected="value" selected="{{selectedUser}}">
-                <template is="dom-repeat" items="[[anwesenheiten.entries()]]">
-                    <paper-item value$="{{item.value}}">{{item.key}}</paper-item>
+        <paper-dropdown-menu labe="Bewohner auswählen">
+            <paper-listbox slot="dropdown-content" class="dropdown-content" attr-for-selected="value" selected="{{selectedUser}}">
+                <template is="dom-repeat" items="[[_asArray(anwesenheiten)]]">
+                    <paper-item value$="{{item.key}}">{{item.value.name}}</paper-item>
                 </template>
-            </paper-menu>
+            </paper-listbox>
         </paper-dropdown-menu>
 
         <div class="layout horizontal wrap">
 
-            <anw-single person={{selectedUser}}>
+            <anw-single person={{_getUser(selectedUser)}}>
             </anw-single>
 
         </div>
@@ -65,8 +64,27 @@
                 return {
                     anwesenheiten: {
                         type: Object
+                    },
+                    selected: {
+                        type: String,
+                        value: "Fabian"
                     }
                 };
+            }
+
+            _asArray(anwesenheiten) {
+                var result = Object.keys(anwesenheiten).map(function (key) {
+                    return { key: key, value: anwesenheiten[key] };
+                });
+
+                console.log(result);
+
+                return result;
+            }
+
+            _getUser(selected) {
+                console.log(selected);
+                return this.anwesenheiten[selected];
             }
         }
 
