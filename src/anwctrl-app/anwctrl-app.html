@@ -64,7 +64,7 @@
                       api-key="AIzaSyCMOpqIHJ0QG5LddQ-DzCQ7bG6RJaZsKHQ"
                       project-id="anwesenheit-550a6" 
                       storage-bucket="anwesenheit-550a6.appspot.com"
-                      messaging-sender-id: "44085346030">
+                      messaging-sender-id="44085346030">
         </firebase-app>
 
         <firebase-document path="anwesenheiten" data="{{anwesenheiten}}">
@@ -76,7 +76,7 @@
                 provider="github"
                 on-error="_errorHandler"></firebase-auth>
 
-        <!--<app-localstorage-document key="selectedUser" data="{{selectedUser}}"></app-localstorage-document>-->
+        <app-localstorage-document key="selectedUser" data="{{selectedUser}}"></app-localstorage-document>
 
         <div class="layout horizontal center-justified">
             <div class="layout vertical">
@@ -126,7 +126,7 @@
             }
 
             _login() {
-                this.$.auth.signInWithPopup()
+                this.$.auth.signInWithRedirect()
                     .then(function (response) {
                         this._errorHandler(response);
                     })
