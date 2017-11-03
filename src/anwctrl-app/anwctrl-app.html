@@ -69,41 +69,33 @@
 
         <!--<app-localstorage-document key="selectedUser" data="{{selectedUser}}"></app-localstorage-document>-->
 
-        <template is="dom-if" if="{{anwesenheiten.sebastian}}">
-            <div class="layout horizontal center-justified">
-                <div class="layout vertical">
-                    <template is="dom-if" if="{{user}}">
-                        <paper-dropdown-menu labe="Bewohner auswählen">
-                            <paper-listbox slot="dropdown-content" class="dropdown-content" attr-for-selected="value" selected="{{selectedUser}}">
-                                <template is="dom-repeat" items="[[_asArray(anwesenheiten)]]">
-                                    <paper-item value$="{{item.key}}">{{item.value.name}}</paper-item>
-                                </template>
-                            </paper-listbox>
-                        </paper-dropdown-menu>
+        <div class="layout horizontal center-justified">
+            <div class="layout vertical">
+                <template is="dom-if" if="{{user}}">
+                    <paper-dropdown-menu labe="Bewohner auswählen">
+                        <paper-listbox slot="dropdown-content" class="dropdown-content" attr-for-selected="value" selected="{{selectedUser}}">
+                            <template is="dom-repeat" items="[[_asArray(anwesenheiten)]]">
+                                <paper-item value$="{{item.key}}">{{item.value.name}}</paper-item>
+                            </template>
+                        </paper-listbox>
+                    </paper-dropdown-menu>
 
-                        <template is="dom-if" if="{{selectedUser}}">
-                            <anw-single person=[[_getUser(anwesenheiten,selectedUser)]]>
-                            </anw-single>
+                    <template is="dom-if" if="{{selectedUser}}">
+                        <anw-single person=[[_getUser(anwesenheiten,selectedUser)]]>
+                        </anw-single>
 
-                            <paper-button on-tap="_clickBtn" raised class="state0">Anwesend</paper-button>
-                            <paper-button on-tap="_clickBtn" raised class="state1">Im Haus unterwegs</paper-button>
-                            <paper-button on-tap="_clickBtn" raised class="state2">abwesend</paper-button>
+                        <paper-button on-tap="_clickBtn" raised class="state0">Anwesend</paper-button>
+                        <paper-button on-tap="_clickBtn" raised class="state1">Im Haus unterwegs</paper-button>
+                        <paper-button on-tap="_clickBtn" raised class="state2">abwesend</paper-button>
 
-                        </template>
                     </template>
+                </template>
 
-                    <template is="dom-if" if="{{!user}}">
-                        <paper-button on-tap="_login" raised>Login</paper-button>
-                    </template>
-                </div>
+                <template is="dom-if" if="{{!user}}">
+                    <paper-button on-tap="_login" raised>Login</paper-button>
+                </template>
             </div>
-
-
-        </template>
-
-        <template is="dom-if" if="{{!anwesenheiten.sebastian}}">
-            <paper-spinner active></paper-spinner>
-        </template>
+        </div>
 
     </template>
 
