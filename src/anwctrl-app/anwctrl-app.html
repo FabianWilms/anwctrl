@@ -70,7 +70,11 @@
         <firebase-document path="anwesenheiten" data="{{anwesenheiten}}">
         </firebase-document>
 
-        <firebase-auth id="auth" user="{{user}}" provider="github"></firebase-auth>
+        <firebase-auth
+                id="auth"
+                user="{{user}}"
+                provider="github"
+                on-error="_errorHandler"></firebase-auth>
 
         <!--<app-localstorage-document key="selectedUser" data="{{selectedUser}}"></app-localstorage-document>-->
 
@@ -122,13 +126,17 @@
             }
 
             _login() {
-                this.$.auth.login()
+                this.$.auth.signInWithPopup()
                     .then(function (response) {
-                        console.log(response);
+                        this._errorHandler(response);
                     })
                     .catch(function (error) {
-                        console.log(error);
+                        this._errorHandler(error);
                     });
+            }
+
+            _errorHandler(error) {
+                console.log(error);
             }
 
             _clickBtn(event) {
