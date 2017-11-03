@@ -138,8 +138,8 @@
             }
 
             _errorHandler(error) {
-                let innerHTML = document.getElementById('mobileconsole').innerHTML;
-                document.getElementById('mobileconsole').innerHTML = innerHTML + '<br>' + error;
+                let innerHTML = this.$.mobileconsole.innerHTML;
+                this.$.mobileconsole.innerHTML = innerHTML + '<br>' + error;
                 console.log(error);
             }
 
