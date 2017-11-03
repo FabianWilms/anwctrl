@@ -82,7 +82,7 @@
                         </paper-dropdown-menu>
 
                         <template is="dom-if" if="{{selectedUser}}">
-                            <anw-single person={{_getUser(selectedUser)}}>
+                            <anw-single person=[[_getUser(anwesenheiten,selectedUser)]]>
                             </anw-single>
 
                             <paper-button on-tap="_clickBtn" raised class="state0">Anwesend</paper-button>
@@ -148,6 +148,7 @@
             _changeState(newStatus, newMessage) {
                 this.set('anwesenheiten.' + this.selectedUser + '.status', newStatus);
                 this.set('anwesenheiten.' + this.selectedUser + '.message', newMessage);
+                this.set('anwesenheiten', JSON.parse(JSON.stringify(this.anwesenheiten)));
             }
 
             _asArray(anwesenheiten) {
@@ -156,8 +157,8 @@
                 });
             }
 
-            _getUser(selected) {
-                return this.anwesenheiten[selected];
+            _getUser(anwesenheiten, selected) {
+                return anwesenheiten[selected];
             }
         }
 
