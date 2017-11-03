@@ -125,7 +125,7 @@
             }
 
             _login() {
-                this.$.auth.signInWithPopup()
+                this.$.auth.signInWithRedirect()
                     .then(function (response) {
                         console.log(response);
                     })
