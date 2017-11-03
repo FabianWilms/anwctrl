@@ -3,6 +3,8 @@
 <link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
 <link rel="import" href="../../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/paper-slider/paper-slider.html">
+<link rel="import" href="../../bower_components/vaadin-date-picker/vaadin-date-picker-light.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
 <link rel="import" href="../../bower_components/iron-icons/communication-icons.html">
@@ -22,32 +24,65 @@
 <dom-module id="anwctrl-app">
     <template>
         <style>
-             :host {
+            :host {
                 display: block;
             }
 
-            .legend paper-card {
-                margin: 8px;
+            .main-content {
+                max-width: 460px;
+                width: 100%;
             }
 
             .loading {
                 height: 100%;
             }
 
+            .full-width {
+                width: 100%;
+            }
+
+            paper-dropdown-menu {
+                width: 80%;
+            }
+
+            paper-card {
+                margin: 8px;
+
+                --paper-card-actions: {
+                    border-top: 1px solid #fafafa;
+                }
+            }
+
+            anw-single {
+                margin: 8px;
+            }
+
             paper-button {
                 margin: 8px;
             }
 
-            .state0 {
-                background-color: var(--paper-teal-400);
+            paper-slider {
+                --paper-slider-pin-color: #000;
+                --paper-slider-active-color: #000;
+                --paper-slider-container-color: #000;
+                --paper-slider-knob-color: #000;
+                --paper-slider-disabled-active-color: #000;
+                --paper-slider-knob-start-border-color: #000;
+                --paper-slider-knob-start-color: #000;
+                --paper-slider-pin-start-color: #000;
+                width: 100%;
             }
 
-            .state1 {
-                background-color: var(--paper-amber-400);
+            .state[state="0"] {
+                color: var(--paper-teal-400);
             }
 
-            .state2 {
-                background-color: var(--paper-red-400);
+            .state[state="1"] {
+                color: var(--paper-amber-400);
+            }
+
+            .state[state="2"] {
+                color: var(--paper-red-400);
             }
 
             iron-icon {
@@ -58,29 +93,21 @@
 
         <style include="iron-flex iron-flex-alignment"></style>
 
-        <firebase-app 
-                      auth-domain="anwesenheit-550a6.firebaseapp.com"
-                      database-url="https://anwesenheit-550a6.firebaseio.com"
-                      api-key="AIzaSyCMOpqIHJ0QG5LddQ-DzCQ7bG6RJaZsKHQ"
-                      project-id="anwesenheit-550a6" 
-                      storage-bucket="anwesenheit-550a6.appspot.com"
-                      messaging-sender-id="44085346030">
+        <firebase-app auth-domain="anwesenheit-550a6.firebaseapp.com" database-url="https://anwesenheit-550a6.firebaseio.com" api-key="AIzaSyCMOpqIHJ0QG5LddQ-DzCQ7bG6RJaZsKHQ"
+            project-id="anwesenheit-550a6" storage-bucket="anwesenheit-550a6.appspot.com" messaging-sender-id="44085346030">
         </firebase-app>
 
         <firebase-document path="anwesenheiten" data="{{anwesenheiten}}">
         </firebase-document>
 
-        <firebase-auth
-                id="auth"
-                user="{{user}}"
-                on-error="_errorHandler"></firebase-auth>
+        <firebase-auth id="auth" user="{{user}}" on-error="_errorHandler"></firebase-auth>
 
         <app-localstorage-document key="selectedUser" data="{{selectedUser}}"></app-localstorage-document>
 
         <div class="layout horizontal center-justified">
-            <div class="layout vertical">
+            <div class="layout vertical main-content">
                 <template is="dom-if" if="{{user}}">
-                    <paper-dropdown-menu labe="Bewohner auswählen">
+                    <paper-dropdown-menu label="Bewohner auswählen">
                         <paper-listbox slot="dropdown-content" class="dropdown-content" attr-for-selected="value" selected="{{selectedUser}}">
                             <template is="dom-repeat" items="[[_asArray(anwesenheiten)]]">
                                 <paper-item value$="{{item.key}}">{{item.value.name}}</paper-item>
@@ -92,10 +119,26 @@
                         <anw-single person=[[_getUser(anwesenheiten,selectedUser)]]>
                         </anw-single>
 
-                        <paper-button on-tap="_clickBtn" raised class="state0">Anwesend</paper-button>
-                        <paper-button on-tap="_clickBtn" raised class="state1">Im Haus unterwegs</paper-button>
-                        <paper-button on-tap="_clickBtn" raised class="state2">abwesend</paper-button>
+                        <paper-card elevation=3>
+                            <div class="card-content">
+                                <paper-input id="inputMessage" label="Message" always-float-label></paper-input>
+                                <div>Status</div>
+                                <paper-slider id="inputStatus" immediate-value="{{curVal}}" pin snaps max="2" max-markers="2" step="1"></paper-slider>
+                                <vaadin-date-picker-light class="full-width" attr-for-value="value" i18n=[[i18nObject]]>
+                                    <paper-input id="inputUntil" label="Gültig bis" always-float-label>
+                                    </paper-input>
+                                </vaadin-date-picker-light>
+                            </div>
+                            <div class="card-actions">
+                                <paper-button class="state" state$="{{curVal}}" on-tap="_saveCustom">Speichern</paper-button>
+                            </div>
+                        </paper-card>
 
+                        <div class="layout horizontal full-width">
+                            <paper-button on-tap="_clickBtn" raised class="state flex" state=0>Anwesend</paper-button>
+                            <paper-button on-tap="_clickBtn" raised class="state flex" state=1>Im Haus unterwegs</paper-button>
+                            <paper-button on-tap="_clickBtn" raised class="state flex" state=2>abwesend</paper-button>
+                        </div>
                     </template>
                 </template>
 
@@ -123,7 +166,36 @@
                         type: Object
                     },
                     selectedUser: String,
-                    user: Object
+                    user: Object,
+                    i18nObject: {
+                        type: Object,
+                        value: {
+                            monthNames: [
+                                'Januar', 'Februar', 'März', 'April', 'Mai',
+                                'Juni', 'Juli', 'August', 'September',
+                                'Oktober', 'November', 'Dezember'
+                            ],
+                            weekdays: [
+                                'Sonntag', 'Montag', 'Dienstag', 'Mittwoch',
+                                'Donnerstag', 'Freitag', 'Samstag'
+                            ],
+                            weekdaysShort: [
+                                'So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'
+                            ],
+                            firstDayOfWeek: 1,
+                            week: 'Woche',
+                            calendar: 'Kalender',
+                            clear: 'Leeren',
+                            today: 'Heute',
+                            cancel: 'Abbrechen',
+                            formatDate: d => {
+                                return ("0" + d.getDate()).slice(-2) + '.' + ("0" + (d.getMonth() + 1)).slice(-2) + '.' + d.getFullYear();
+                            },
+                            formatTitle: (monthName, fullYear) => {
+                                return monthName + ' ' + fullYear;
+                            }
+                        }
+                    }
                 };
             }
 
@@ -153,20 +225,35 @@
                 console.log(error);
             }
 
+            _saveCustom() {
+                let inpmessage = this.shadowRoot.querySelector('#inputMessage');
+                let inpstatus = this.shadowRoot.querySelector('#inputStatus');
+                let inpuntil = this.shadowRoot.querySelector('#inputUntil');
+                this._changeState(inpstatus.value, inpmessage.value, inpuntil.value);
+                inpmessage.value = "";
+                inpstatus.value = "";
+                inpuntil.value = "";
+            }
+
             _clickBtn(event) {
                 var outerHTML = event.target.outerHTML;
-                if (outerHTML.includes("state0")) {
+                if (outerHTML.includes('state="0"')) {
                     this._changeState(0, "Anwesend");
-                } else if (outerHTML.includes("state1")) {
+                } else if (outerHTML.includes('state="1"')) {
                     this._changeState(1, "Im Haus unterwegs");
-                } else if (outerHTML.includes("state2")) {
+                } else if (outerHTML.includes('state="2"')) {
                     this._changeState(2, "Abwesend");
                 }
             }
 
             _changeState(newStatus, newMessage) {
+                this._changeState(newStatus, newMessage, newUntil);
+            }
+
+            _changeState(newStatus, newMessage, newUntil) {
                 this.set('anwesenheiten.' + this.selectedUser + '.status', newStatus);
                 this.set('anwesenheiten.' + this.selectedUser + '.message', newMessage);
+                this.set('anwesenheiten.' + this.selectedUser + '.until', newUntil);
                 this.set('anwesenheiten', JSON.parse(JSON.stringify(this.anwesenheiten)));
             }
 

@@ -1,23 +1,49 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">
 
-    <title>ANW-CTRL</title>
-    <meta name="description" content="Anwesenheit des Büros">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">
 
-    <!-- See https://goo.gl/OOhYW5 -->
-    <link rel="manifest" href="/manifest.json">
+  <title>ANW-CTRL</title>
+  <meta name="description" content="Anwesenheit des Büros">
 
-    <link rel="stylesheet" href="styles/main.css">
-    <style is="custom-style" include="shared-styles"></style>
+  <!-- See https://goo.gl/OOhYW5 -->
+  <link rel="manifest" href="/manifest.json">
 
-    <script src="/bower_components/webcomponentsjs/webcomponents-lite.js"></script>
+  <link rel="stylesheet" href="styles/main.css">
+  <style is="custom-style" include="shared-styles"></style>
 
-    <link rel="import" href="/src/anwctrl-app/anwctrl-app.html">
-  </head>
-  <body>
-    <anwctrl-app></anwctrl-app>
-  </body>
+  <script src="/bower_components/webcomponentsjs/webcomponents-lite.js"></script>
+
+  <link rel="import" href="/src/anwctrl-app/anwctrl-app.html">
+
+  <!-- Chrome for Android theme color -->
+  <meta name="theme-color" content="#448aff">
+
+  <!-- Web Application Manifest -->
+  <link rel="manifest" href="manifest.json">
+
+  <!-- Tile color for Win8 -->
+  <meta name="msapplication-TileColor" content="#448aff">
+
+  <!-- Add to homescreen for Chrome on Android -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="application-name" content="Anwesenheits Controller">
+  <link rel="icon" sizes="192x192" href="images/touch/android-icon-192x192.png">
+
+  <!-- Add to homescreen for Safari on iOS -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="Anwesenheits Controller">
+  <link rel="apple-touch-icon" href="images/touch/apple-icon.png">
+
+  <!-- Tile icon for Win8 (144x144) -->
+  <meta name="msapplication-TileImage" content="images/touch/ms-icon-144x144-precomposed.png">
+</head>
+
+<body>
+  <anwctrl-app></anwctrl-app>
+</body>
+
 </html>

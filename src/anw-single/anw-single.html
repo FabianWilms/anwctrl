@@ -5,17 +5,13 @@
 <dom-module id="anw-single">
   <template>
     <style>
-      :host {
-        padding: 8px;
-      }
-
       paper-card {
-        width: 320px;
+        width: 100%;
       }
 
       .card-header {
-          font-size: 32px;
-          padding: 12px 16px 8px 16px;
+        font-size: 32px;
+        padding: 12px 16px 8px 16px;
       }
 
       .card-content {
@@ -26,19 +22,54 @@
         border-radius: 50%;
         width: 50px;
       }
+
+      td.fieldname {
+        text-align: right;
+        padding-right: 10px;
+      }
+
+      paper-card[state="0"] {
+        background-color: var(--paper-teal-400);
+      }
+
+      paper-card[state="1"] {
+        background-color: var(--paper-amber-400);
+      }
+
+      paper-card[state="2"] {
+        background-color: var(--paper-red-400);
+      }
     </style>
 
     <style include="iron-flex iron-flex-alignment"></style>
 
     <paper-card state$="[[person.status]]">
       <div class="layout horizontal center card-header">
-          <span class="flex">[[person.name]]</span>
-          <img src="[[person.avatar]]" class="img-circle"></img>
+        <span class="flex">[[person.name]]</span>
+        <img src="[[person.avatar]]" class="img-circle"></img>
       </div>
 
       <div class="card-content">
-        <p><b>Status:</b> [[person.status]]</p>
-        <p><b>Text:</b>[[person.message]]</p>
+        <table>
+          <tr>
+            <td class="fieldname">
+              <b>Status</b>
+            </td>
+            <td>[[person.status]]</td>
+          </tr>
+          <tr>
+            <td class="fieldname">
+              <b>Message</b>
+            </td>
+            <td>[[person.message]]</td>
+          </tr>
+          <tr>
+            <td class="fieldname">
+              <b>Abwesend bis</b>
+            </td>
+            <td>[[person.until]]</td>
+          </tr>
+        </table>
       </div>
     </paper-card>
   </template>
