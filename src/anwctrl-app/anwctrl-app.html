@@ -73,7 +73,6 @@
         <firebase-auth
                 id="auth"
                 user="{{user}}"
-                provider="github"
                 on-error="_errorHandler"></firebase-auth>
 
         <app-localstorage-document key="selectedUser" data="{{selectedUser}}"></app-localstorage-document>
@@ -101,7 +100,8 @@
                 </template>
 
                 <template is="dom-if" if="{{!user}}">
-                    <paper-button on-tap="_login" raised>Login</paper-button>
+                    <paper-button on-tap="_loginGithub" raised>Login Github</paper-button>
+                    <paper-button on-tap="_loginGoogle" raised>Login Google</paper-button>
                 </template>
             </div>
         </div>
@@ -127,8 +127,18 @@
                 };
             }
 
-            _login() {
-                this.$.auth.signInWithRedirect()
+            _loginGithub() {
+                this.$.auth.signInWithRedirect("github")
+                    .then(function (response) {
+                        this._errorHandler(response);
+                    })
+                    .catch(function (error) {
+                        this._errorHandler(error);
+                    });
+            }
+
+            _loginGoogle() {
+                this.$.auth.signInWithRedirect("google")
                     .then(function (response) {
                         this._errorHandler(response);
                     })
