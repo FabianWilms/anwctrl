@@ -2,11 +2,18 @@
 <link rel="import" href="../../bower_components/paper-styles/default-theme.html">
 <link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
 <link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../bower_components/iron-icons/communication-icons.html">
 <link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../../bower_components/neon-animation/web-animations.html">
 <link rel="import" href="../../bower_components/polymerfire/firebase-app.html">
 <link rel="import" href="../../bower_components/polymerfire/firebase-document.html">
+<link rel="import" href="../../bower_components/polymerfire/firebase-auth.html">
+<link rel="import" href="../../bower_components/app-storage/app-localstorage/app-localstorage-document.html">
 
 <link rel="import" href="../../styles/app-theme.html">
 <link rel="import" href="../anw-single/anw-single.html">
@@ -26,6 +33,27 @@
             .loading {
                 height: 100%;
             }
+
+            paper-button {
+                margin: 8px;
+            }
+
+            .state0 {
+                background-color: var(--paper-teal-400);
+            }
+
+            .state1 {
+                background-color: var(--paper-amber-400);
+            }
+
+            .state2 {
+                background-color: var(--paper-red-400);
+            }
+
+            iron-icon {
+                color: var(--secondary-text-color);
+                padding-right: 8px;
+            }
         </style>
 
         <style include="iron-flex iron-flex-alignment"></style>
@@ -37,20 +65,46 @@
         <firebase-document path="anwesenheiten" data="{{anwesenheiten}}">
         </firebase-document>
 
-        <paper-dropdown-menu labe="Bewohner auswählen">
-            <paper-listbox slot="dropdown-content" class="dropdown-content" attr-for-selected="value" selected="{{selectedUser}}">
-                <template is="dom-repeat" items="[[_asArray(anwesenheiten)]]">
-                    <paper-item value$="{{item.key}}">{{item.value.name}}</paper-item>
-                </template>
-            </paper-listbox>
-        </paper-dropdown-menu>
+        <firebase-auth id="auth" user="{{user}}" provider="github"></firebase-auth>
 
-        <div class="layout horizontal wrap">
+        <app-localstorage-document key="selectedUser" data="{{selectedUser}}"></app-localstorage-document>
 
-            <anw-single person={{_getUser(selectedUser)}}>
-            </anw-single>
+        <template is="dom-if" if="{{anwesenheiten.sebastian}}">
+            <div class="layout horizontal center-justified">
+                <div class="layout vertical">
+                    <template is="dom-if" if="{{user}}">
+                        <paper-dropdown-menu labe="Bewohner auswählen">
+                            <paper-listbox slot="dropdown-content" class="dropdown-content" attr-for-selected="value" selected="{{selectedUser}}">
+                                <template is="dom-repeat" items="[[_asArray(anwesenheiten)]]">
+                                    <paper-item value$="{{item.key}}">{{item.value.name}}</paper-item>
+                                </template>
+                            </paper-listbox>
+                        </paper-dropdown-menu>
 
-        </div>
+                        <template is="dom-if" if="{{selectedUser}}">
+                            <anw-single person={{_getUser(selectedUser)}}>
+                            </anw-single>
+
+                            <paper-button on-tap="_clickBtn" raised class="state0">Anwesend</paper-button>
+                            <paper-button on-tap="_clickBtn" raised class="state1">Im Haus unterwegs</paper-button>
+                            <paper-button on-tap="_clickBtn" raised class="state2">abwesend</paper-button>
+
+                        </template>
+                    </template>
+
+                    <template is="dom-if" if="{{!user}}">
+                        <paper-button on-tap="_login" raised>Login</paper-button>
+                    </template>
+                </div>
+            </div>
+
+
+        </template>
+
+        <template is="dom-if" if="{{!anwesenheiten.sebastian}}">
+            <paper-spinner active></paper-spinner>
+        </template>
+
     </template>
 
     <script>
@@ -65,25 +119,44 @@
                     anwesenheiten: {
                         type: Object
                     },
-                    selected: {
-                        type: String,
-                        value: "Fabian"
-                    }
+                    selectedUser: String,
+                    user: Object
                 };
             }
 
+            _login() {
+                this.$.auth.signInWithPopup()
+                    .then(function (response) {
+                        console.log(response);
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+            }
+
+            _clickBtn(event) {
+                var outerHTML = event.target.outerHTML;
+                if (outerHTML.includes("state0")) {
+                    this._changeState(0, "Anwesend");
+                } else if (outerHTML.includes("state1")) {
+                    this._changeState(1, "Im Haus unterwegs");
+                } else if (outerHTML.includes("state2")) {
+                    this._changeState(2, "Abwesend");
+                }
+            }
+
+            _changeState(newStatus, newMessage) {
+                this.set('anwesenheiten.' + this.selectedUser + '.status', newStatus);
+                this.set('anwesenheiten.' + this.selectedUser + '.message', newMessage);
+            }
+
             _asArray(anwesenheiten) {
-                var result = Object.keys(anwesenheiten).map(function (key) {
+                return Object.keys(anwesenheiten).map(function (key) {
                     return { key: key, value: anwesenheiten[key] };
                 });
-
-                console.log(result);
-
-                return result;
             }
 
             _getUser(selected) {
-                console.log(selected);
                 return this.anwesenheiten[selected];
             }
         }
