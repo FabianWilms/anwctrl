@@ -3,11 +3,16 @@
 <link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
 <link rel="import" href="../../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../../bower_components/paper-input/paper-input.html">
-<link rel="import" href="../../bower_components/paper-slider/paper-slider.html">
 <link rel="import" href="../../bower_components/vaadin-date-picker/vaadin-date-picker-light.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-badge/paper-badge.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item-body.html">
+<link rel="import" href="../../bower_components/paper-radio-group/paper-radio-group.html">
+<link rel="import" href="../../bower_components/paper-radio-button/paper-radio-button.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
-<link rel="import" href="../../bower_components/iron-icons/communication-icons.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
 <link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
@@ -16,6 +21,7 @@
 <link rel="import" href="../../bower_components/polymerfire/firebase-document.html">
 <link rel="import" href="../../bower_components/polymerfire/firebase-auth.html">
 <link rel="import" href="../../bower_components/app-storage/app-localstorage/app-localstorage-document.html">
+<link rel="import" href="../../bower_components/app-layout/app-layout.html">
 
 <link rel="import" href="../../styles/app-theme.html">
 <link rel="import" href="../anw-single/anw-single.html">
@@ -41,8 +47,30 @@
                 width: 100%;
             }
 
-            paper-dropdown-menu {
-                width: 80%;
+            paper-badge {
+                --paper-badge-background: rgba(0, 0, 0, 0);
+                --paper-badge-text-color: #fff;
+            }
+
+            app-toolbar {
+                background-color: #448aff;
+                color: white;
+            }
+
+            app-drawer {
+                z-index: 999;
+                top: 64px;
+                --app-drawer-content-container: {
+                    padding: 0px;
+                    background-color: #eee;
+                }
+                ;
+            }
+
+            paper-progress {
+                width: 100%;
+                --paper-progress-active-color: #000;
+                --paper-progress-container-color: #fff;
             }
 
             paper-card {
@@ -97,12 +125,33 @@
             project-id="anwesenheit-550a6" storage-bucket="anwesenheit-550a6.appspot.com" messaging-sender-id="44085346030">
         </firebase-app>
 
-        <firebase-document path="anwesenheiten" data="{{anwesenheiten}}">
-        </firebase-document>
+        <firebase-document path="anwesenheiten" data="{{anwesenheiten}}"></firebase-document>
+
+        <firebase-document path="notify" data="{{notifies}}"></firebase-document>
 
         <firebase-auth id="auth" user="{{user}}" on-error="_errorHandler"></firebase-auth>
 
         <app-localstorage-document key="selectedUser" data="{{selectedUser}}"></app-localstorage-document>
+
+        <app-header>
+            <app-toolbar>
+                <div main-title>Anwesenheits Controller</div>
+                <paper-icon-button id="btn" icon="inbox" on-tap="_toggleDrawer"></paper-icon-button>
+                <paper-badge for="btn" label="[[_getNotifies(notifies,selectedUser)]]"></paper-badge>
+                <paper-progress visible="{{anwesenheiten.sebastian}}" indeterminate="{{!anwesenheiten.sebastian}}" bottom-item></paper-progress>
+            </app-toolbar>
+        </app-header>
+
+        <app-drawer id="drawer" align="end">
+            <template is="dom-repeat" items="[[_asArrayByUser(notifies, selectedUser)]]" as="n">
+                <paper-item>
+                    <paper-item-body two-line>
+                        <div>Besuchsanfrage</div>
+                        <div secondary>{{n.value}}</div>
+                    </paper-item-body>
+                </paper-item>
+            </template>
+        </app-drawer>
 
         <div class="layout horizontal center-justified">
             <div class="layout vertical main-content">
@@ -123,7 +172,11 @@
                             <div class="card-content">
                                 <paper-input id="inputMessage" label="Message" always-float-label></paper-input>
                                 <div>Status</div>
-                                <paper-slider id="inputStatus" immediate-value="{{curVal}}" pin snaps max="2" max-markers="2" step="1"></paper-slider>
+                                <paper-radio-group selected="{{curVal}}">
+                                    <paper-radio-button name="0">Anwesend</paper-radio-button>
+                                    <paper-radio-button name="1">Unterwegs</paper-radio-button>
+                                    <paper-radio-button name="2">Abwesend</paper-radio-button>
+                                </paper-radio-group>
                                 <vaadin-date-picker-light class="full-width" attr-for-value="value" i18n=[[i18nObject]]>
                                     <paper-input id="inputUntil" label="Gültig bis" always-float-label>
                                     </paper-input>
@@ -148,8 +201,6 @@
                 </template>
             </div>
         </div>
-
-        <div id="mobileconsole"></div>
 
     </template>
 
@@ -220,8 +271,6 @@
             }
 
             _errorHandler(error) {
-                let innerHTML = this.$.mobileconsole.innerHTML;
-                this.$.mobileconsole.innerHTML = innerHTML + '<br>' + error;
                 console.log(error);
             }
 
@@ -257,14 +306,33 @@
                 this.set('anwesenheiten', JSON.parse(JSON.stringify(this.anwesenheiten)));
             }
 
-            _asArray(anwesenheiten) {
-                return Object.keys(anwesenheiten).map(function (key) {
-                    return { key: key, value: anwesenheiten[key] };
+            _asArrayByUser(obj, selectedUser) {
+                if (typeof obj != 'undefined') {
+                    if (typeof obj[selectedUser] != 'undefined') {
+                        return this._asArray(obj[selectedUser]);
+                    }
+                }
+            }
+
+            _asArray(obj) {
+                return Object.keys(obj).map(function (key) {
+                    return { key: key, value: obj[key] };
                 });
             }
 
             _getUser(anwesenheiten, selected) {
                 return anwesenheiten[selected];
+            }
+
+            _getNotifies(n, selected) {
+                if (typeof n[selected] != 'undefined') {
+                    return Object.keys(n[selected]).length;
+                }
+                return "";
+            }
+
+            _toggleDrawer(event) {
+                this.$.drawer.toggle();
             }
         }
 
