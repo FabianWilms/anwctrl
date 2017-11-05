@@ -13,8 +13,8 @@
 <link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
 <link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
-<link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
-<link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../../bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../../bower_components/paper-tabs/paper-tab.html">
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../../bower_components/neon-animation/web-animations.html">
 <link rel="import" href="../../bower_components/polymerfire/firebase-app.html">
@@ -45,6 +45,15 @@
 
             .full-width {
                 width: 100%;
+            }
+
+            paper-tabs {
+                --paper-tabs-selection-bar-color: #fff;
+                --paper-tab-ink: #fff;
+                --paper-tabs: {
+                    background-color: #448aff;
+                    color: #fff;
+                }
             }
 
             paper-badge {
@@ -142,7 +151,7 @@
             </app-toolbar>
         </app-header>
 
-        <app-drawer id="drawer" align="end">
+        <app-drawer id="drawer" align="end" swipe-open>
             <template is="dom-repeat" items="[[_asArrayByUser(notifies, selectedUser)]]" as="n">
                 <paper-item>
                     <paper-item-body two-line>
@@ -153,17 +162,17 @@
             </template>
         </app-drawer>
 
+        <template is="dom-if" if="{{user}}">
+            <paper-tabs attr-for-selected="value" selected="{{selectedUser}}" selected="0" scrollable>
+                <template is="dom-repeat" items="[[_asArray(anwesenheiten)]]">
+                    <paper-tab value$="{{item.key}}">{{item.value.name}}</paper-tab>
+                </template>
+            </paper-tabs>
+        </template>
+
         <div class="layout horizontal center-justified">
             <div class="layout vertical main-content">
                 <template is="dom-if" if="{{user}}">
-                    <paper-dropdown-menu label="Bewohner auswählen">
-                        <paper-listbox slot="dropdown-content" class="dropdown-content" attr-for-selected="value" selected="{{selectedUser}}">
-                            <template is="dom-repeat" items="[[_asArray(anwesenheiten)]]">
-                                <paper-item value$="{{item.key}}">{{item.value.name}}</paper-item>
-                            </template>
-                        </paper-listbox>
-                    </paper-dropdown-menu>
-
                     <template is="dom-if" if="{{selectedUser}}">
                         <anw-single person=[[_getUser(anwesenheiten,selectedUser)]]>
                         </anw-single>
@@ -213,9 +222,8 @@
             static get is() { return 'anwctrl-app'; }
             static get properties() {
                 return {
-                    anwesenheiten: {
-                        type: Object
-                    },
+                    anwesenheiten: Object,
+                    notifies: Object,
                     selectedUser: String,
                     user: Object,
                     i18nObject: {
