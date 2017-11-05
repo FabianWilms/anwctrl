@@ -274,7 +274,20 @@
 
             _sendNotification(newCount) {
                 if (newCount > this.lastCount) {
-                    //TODO notify
+                    navigator.serviceWorker.register('sw.js');
+                    Notification.requestPermission(function (result) {
+                        if (result === 'granted') {
+                            navigator.serviceWorker.ready.then(function (registration) {
+                                registration.showNotification('Neue Benachrichtigung erhalten',
+                                    {
+                                        badge: "../../images/touch/android-icon-96x96.png",
+                                        body: newCount + " neue Benachrichtigungen",
+                                        icon: "../../images/touch/android-icon-36x36.png",
+                                        vibrate: [300, 100, 300]
+                                    });
+                            });
+                        }
+                    });
                 }
                 this.lastCount = newCount;
             }
