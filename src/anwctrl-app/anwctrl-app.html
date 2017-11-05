@@ -19,6 +19,7 @@
 <link rel="import" href="../../bower_components/neon-animation/web-animations.html">
 <link rel="import" href="../../bower_components/polymerfire/firebase-app.html">
 <link rel="import" href="../../bower_components/polymerfire/firebase-document.html">
+<link rel="import" href="../../bower_components/polymerfire/firebase-query.html">
 <link rel="import" href="../../bower_components/polymerfire/firebase-auth.html">
 <link rel="import" href="../../bower_components/app-storage/app-localstorage/app-localstorage-document.html">
 <link rel="import" href="../../bower_components/app-layout/app-layout.html">
@@ -59,6 +60,10 @@
             paper-badge {
                 --paper-badge-background: rgba(0, 0, 0, 0);
                 --paper-badge-text-color: #fff;
+            }
+
+            paper-badge[aria-label="0"] {
+                visibility: hidden;
             }
 
             app-toolbar {
@@ -134,9 +139,10 @@
             project-id="anwesenheit-550a6" storage-bucket="anwesenheit-550a6.appspot.com" messaging-sender-id="44085346030">
         </firebase-app>
 
-        <firebase-document path="anwesenheiten" data="{{anwesenheiten}}"></firebase-document>
+        <firebase-document path="anwesenheiten" data="{{gesamtAnwesenheiten}}"></firebase-document>
+        <firebase-document path="anwesenheiten/[[selectedUser]]" data="{{selectedAnwesenheit}}"></firebase-document>
 
-        <firebase-document path="notify" data="{{notifies}}"></firebase-document>
+        <firebase-query path="notify/[[selectedUser]]" data="{{notifies}}"></firebase-query>
 
         <firebase-auth id="auth" user="{{user}}" on-error="_errorHandler"></firebase-auth>
 
@@ -146,17 +152,17 @@
             <app-toolbar>
                 <div main-title>Anwesenheits Controller</div>
                 <paper-icon-button id="btn" icon="inbox" on-tap="_toggleDrawer"></paper-icon-button>
-                <paper-badge for="btn" label="[[_getNotifies(notifies,selectedUser)]]"></paper-badge>
-                <paper-progress visible="{{anwesenheiten.sebastian}}" indeterminate="{{!anwesenheiten.sebastian}}" bottom-item></paper-progress>
+                <paper-badge for="btn" label="[[notifies.length]]"></paper-badge>
+                <paper-progress visible="{{gesamtAnwesenheiten.sebastian}}" indeterminate="{{!gesamtAnwesenheiten.sebastian}}" bottom-item></paper-progress>
             </app-toolbar>
         </app-header>
 
         <app-drawer id="drawer" align="end" swipe-open>
-            <template is="dom-repeat" items="[[_asArrayByUser(notifies, selectedUser)]]" as="n">
+            <template is="dom-repeat" items="[[notifies]]">
                 <paper-item>
                     <paper-item-body two-line>
                         <div>Besuchsanfrage</div>
-                        <div secondary>{{n.value}}</div>
+                        <div secondary>{{item.$val}}</div>
                     </paper-item-body>
                 </paper-item>
             </template>
@@ -164,7 +170,7 @@
 
         <template is="dom-if" if="{{user}}">
             <paper-tabs attr-for-selected="value" selected="{{selectedUser}}" selected="0" scrollable>
-                <template is="dom-repeat" items="[[_asArray(anwesenheiten)]]">
+                <template is="dom-repeat" items="[[_asArray(gesamtAnwesenheiten)]]">
                     <paper-tab value$="{{item.key}}">{{item.value.name}}</paper-tab>
                 </template>
             </paper-tabs>
@@ -174,7 +180,8 @@
             <div class="layout vertical main-content">
                 <template is="dom-if" if="{{user}}">
                     <template is="dom-if" if="{{selectedUser}}">
-                        <anw-single person=[[_getUser(anwesenheiten,selectedUser)]]>
+
+                        <anw-single person={{selectedAnwesenheit}}>
                         </anw-single>
 
                         <paper-card elevation=3>
@@ -222,8 +229,9 @@
             static get is() { return 'anwctrl-app'; }
             static get properties() {
                 return {
-                    anwesenheiten: Object,
-                    notifies: Object,
+                    lastCount: Number,
+                    gesamtAnwesenheiten: Object,
+                    notifies: Array,
                     selectedUser: String,
                     user: Object,
                     i18nObject: {
@@ -256,6 +264,19 @@
                         }
                     }
                 };
+            }
+
+            static get observers() {
+                return [
+                    '_sendNotification(notifies.length)'
+                ]
+            }
+
+            _sendNotification(newCount) {
+                if (newCount > this.lastCount) {
+                    //TODO notify
+                }
+                this.lastCount = newCount;
             }
 
             _loginGithub() {
@@ -332,11 +353,14 @@
                 return anwesenheiten[selected];
             }
 
-            _getNotifies(n, selected) {
-                if (typeof n[selected] != 'undefined') {
-                    return Object.keys(n[selected]).length;
+            _getNotifies(n, selectedUser) {
+                console.log(n);
+                var count = "";
+                if (typeof n != 'undefined') {
+                    count = n.length;
+                    count = count === 0 ? "" : count;
                 }
-                return "";
+                return count;
             }
 
             _toggleDrawer(event) {
