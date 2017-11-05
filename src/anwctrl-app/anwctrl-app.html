@@ -172,7 +172,7 @@
                             <div class="card-content">
                                 <paper-input id="inputMessage" label="Message" always-float-label></paper-input>
                                 <div>Status</div>
-                                <paper-radio-group selected="{{curVal}}">
+                                <paper-radio-group id="inputStatus" selected="{{curVal}}">
                                     <paper-radio-button name="0">Anwesend</paper-radio-button>
                                     <paper-radio-button name="1">Unterwegs</paper-radio-button>
                                     <paper-radio-button name="2">Abwesend</paper-radio-button>
@@ -278,7 +278,7 @@
                 let inpmessage = this.shadowRoot.querySelector('#inputMessage');
                 let inpstatus = this.shadowRoot.querySelector('#inputStatus');
                 let inpuntil = this.shadowRoot.querySelector('#inputUntil');
-                this._changeState(inpstatus.value, inpmessage.value, inpuntil.value);
+                this._changeState(inpstatus.selected, inpmessage.value, inpuntil.value);
                 inpmessage.value = "";
                 inpstatus.value = "";
                 inpuntil.value = "";
