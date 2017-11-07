@@ -229,7 +229,7 @@
             static get is() { return 'anwctrl-app'; }
             static get properties() {
                 return {
-                    lastCount: Number,
+                    lastNObj: Object,
                     gesamtAnwesenheiten: Object,
                     notifies: Array,
                     selectedUser: String,
@@ -266,30 +266,81 @@
                 };
             }
 
+            ready() {
+                super.ready();
+                navigator.serviceWorker.register('service-worker.js');
+            }
+
             static get observers() {
                 return [
-                    '_sendNotification(notifies.length)'
+                    '_sendNotification(notifies.*)'
                 ]
             }
 
-            _sendNotification(newCount) {
-                if (newCount > this.lastCount) {
-                    navigator.serviceWorker.register('service-worker.js');
+            _sendNotification(newNData) {
+                newNData = newNData.base;
+
+                if (typeof this.lastNObj === "undefined") {
+                    this.lastNObj = this._arrayToObject(newNData);
+                    return;
+                }
+
+                if (newNData.length > Object.keys(this.lastNObj).length) {
+                    var newNObj = this._arrayToObject(newNData);
+                    var newNotifications = this._getDiff(newNObj, this.lastNObj);
+
                     Notification.requestPermission(function (result) {
                         if (result === 'granted') {
                             navigator.serviceWorker.ready.then(function (registration) {
-                                registration.showNotification('Neue Benachrichtigung erhalten',
-                                    {
-                                        badge: "https://fabianwilms.github.io/anwctrl/images/touch/notification.png",
-                                        body: newCount + " neue Benachrichtigungen",
-                                        icon: "https://fabianwilms.github.io/anwctrl/images/touch/notification.png",
-                                        vibrate: [300, 100, 300]
-                                    });
+                                for (var key in newNotifications) {
+                                    registration.showNotification(newNotifications[key].name + ' möchte dich treffen!',
+                                        {
+                                            badge: "https://fabianwilms.github.io/anwctrl/images/touch/notification.png",
+                                            body: 'Gesendet am ' + new Date(newNotifications[key].date).toLocaleDateString(),
+                                            icon: "https://fabianwilms.github.io/anwctrl/images/touch/notification.png",
+                                            vibrate: [300, 100, 300]
+                                        });
+                                }
                             });
+
                         }
                     });
+
+                    this.lastNObj = newNObj;
                 }
-                this.lastCount = newCount;
+            }
+
+            _arrayToObject(arrayObject) {
+                var retObj = {};
+                for (var i in arrayObject) {
+                    retObj[arrayObject[i].$key] = {
+                        name: arrayObject[i].name,
+                        date: arrayObject[i].date
+                    }
+                }
+                return retObj;
+            }
+
+            _getDiff(obj1, obj2) {
+                var larger, diff = {};
+
+                if (Object.keys(obj1).length > Object.keys(obj2).length) {
+                    larger = obj1;
+                } else if (Object.keys(obj2).length > Object.keys(obj1).length) {
+                    larger = obj2;
+                } else {
+                    return diff;
+                }
+
+                for (var key in larger) {
+                    if (obj1.hasOwnProperty(key) && obj2.hasOwnProperty(key)) {
+                        // do nothing
+                    } else {
+                        diff[key] = obj1.hasOwnProperty ? obj1[key] : obj2[key];
+                    }
+                }
+
+                return diff;
             }
 
             _loginGithub() {
@@ -329,23 +380,18 @@
             _clickBtn(event) {
                 var outerHTML = event.target.outerHTML;
                 if (outerHTML.includes('state="0"')) {
-                    this._changeState(0, "Anwesend");
+                    this._changeState(0, "Anwesend", "");
                 } else if (outerHTML.includes('state="1"')) {
-                    this._changeState(1, "Im Haus unterwegs");
+                    this._changeState(1, "Im Haus unterwegs", "");
                 } else if (outerHTML.includes('state="2"')) {
-                    this._changeState(2, "Abwesend");
+                    this._changeState(2, "Abwesend", "");
                 }
             }
 
-            _changeState(newStatus, newMessage) {
-                this._changeState(newStatus, newMessage, newUntil);
-            }
-
             _changeState(newStatus, newMessage, newUntil) {
-                this.set('anwesenheiten.' + this.selectedUser + '.status', newStatus);
-                this.set('anwesenheiten.' + this.selectedUser + '.message', newMessage);
-                this.set('anwesenheiten.' + this.selectedUser + '.until', newUntil);
-                this.set('anwesenheiten', JSON.parse(JSON.stringify(this.anwesenheiten)));
+                this.set('selectedAnwesenheit.status', newStatus);
+                this.set('selectedAnwesenheit.message', newMessage);
+                this.set('selectedAnwesenheit.until', newUntil);
             }
 
             _asArrayByUser(obj, selectedUser) {
@@ -364,16 +410,6 @@
 
             _getUser(anwesenheiten, selected) {
                 return anwesenheiten[selected];
-            }
-
-            _getNotifies(n, selectedUser) {
-                console.log(n);
-                var count = "";
-                if (typeof n != 'undefined') {
-                    count = n.length;
-                    count = count === 0 ? "" : count;
-                }
-                return count;
             }
 
             _toggleDrawer(event) {
