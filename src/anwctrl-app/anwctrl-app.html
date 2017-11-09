@@ -161,8 +161,10 @@
             <template is="dom-repeat" items="[[notifies]]">
                 <paper-item>
                     <paper-item-body two-line>
-                        <div>Besuchsanfrage</div>
-                        <div secondary>{{item.$val}}</div>
+                        <div>{{item.name}}</div>
+                        <div secondary>
+                            {{_toDateString(item.date)}}
+                        </div>
                     </paper-item-body>
                 </paper-item>
             </template>
@@ -194,7 +196,7 @@
                                     <paper-radio-button name="2">Abwesend</paper-radio-button>
                                 </paper-radio-group>
                                 <vaadin-date-picker-light class="full-width" attr-for-value="value" i18n=[[i18nObject]]>
-                                    <paper-input id="inputUntil" label="Gültig bis" always-float-label>
+                                    <paper-input id="inputUntil" label="Gültig bis (einschließlich)" always-float-label>
                                     </paper-input>
                                 </vaadin-date-picker-light>
                             </div>
@@ -296,7 +298,8 @@
                                     registration.showNotification(newNotifications[key].name + ' möchte dich treffen!',
                                         {
                                             badge: "https://fabianwilms.github.io/anwctrl/images/touch/notification.png",
-                                            body: 'Gesendet am ' + new Date(newNotifications[key].date).toLocaleDateString(),
+                                            body: 'Gesendet am ' +
+                                                document.querySelector('anwctrl-app')._toDateString(newNotifications[key].date),
                                             icon: "https://fabianwilms.github.io/anwctrl/images/touch/notification.png",
                                             vibrate: [300, 100, 300]
                                         });
@@ -414,6 +417,15 @@
 
             _toggleDrawer(event) {
                 this.$.drawer.toggle();
+            }
+
+
+            _toDateString(dateString) {
+                var d = new Date(dateString);
+                var dayName = this.i18nObject.weekdays[d.getDay()];
+                var date = d.getDay() + "." + d.getMonth() + "." + d.getFullYear();
+                var time = d.getHours() + ":" + d.getMinutes() + " Uhr";
+                return dayName + ", " + date + " um " + time;
             }
         }
 
