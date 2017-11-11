@@ -26,6 +26,7 @@
 
 <link rel="import" href="../../styles/app-theme.html">
 <link rel="import" href="../anw-single/anw-single.html">
+<link rel="import" href="../anw-notifications/anw-notifications.html">
 
 
 <dom-module id="anwctrl-app">
@@ -141,6 +142,7 @@
 
         <firebase-document path="anwesenheiten" data="{{gesamtAnwesenheiten}}"></firebase-document>
         <firebase-document path="anwesenheiten/[[selectedUser]]" data="{{selectedAnwesenheit}}"></firebase-document>
+        <firebase-document path="notify/[[selectedUser]]" data="{{secondifies}}"></firebase-document>
 
         <firebase-query path="notify/[[selectedUser]]" data="{{notifies}}"></firebase-query>
 
@@ -158,16 +160,7 @@
         </app-header>
 
         <app-drawer id="drawer" align="end" swipe-open>
-            <template is="dom-repeat" items="[[notifies]]">
-                <paper-item>
-                    <paper-item-body two-line>
-                        <div>{{item.name}}</div>
-                        <div secondary>
-                            {{_toDateString(item.date)}}
-                        </div>
-                    </paper-item-body>
-                </paper-item>
-            </template>
+            <anw-notifications on-delete="_delete" notifies={{notifies}}></anw-notificiations>
         </app-drawer>
 
         <template is="dom-if" if="{{user}}">
@@ -268,81 +261,8 @@
                 };
             }
 
-            ready() {
-                super.ready();
-                navigator.serviceWorker.register('service-worker.js');
-            }
-
-            static get observers() {
-                return [
-                    '_sendNotification(notifies.*)'
-                ]
-            }
-
-            _sendNotification(newNData) {
-                newNData = newNData.base;
-
-                if (typeof this.lastNObj === "undefined") {
-                    this.lastNObj = this._arrayToObject(newNData);
-                    return;
-                }
-
-                if (newNData.length > Object.keys(this.lastNObj).length) {
-                    var newNObj = this._arrayToObject(newNData);
-                    var newNotifications = this._getDiff(newNObj, this.lastNObj);
-
-                    Notification.requestPermission(function (result) {
-                        if (result === 'granted') {
-                            navigator.serviceWorker.ready.then(function (registration) {
-                                for (var key in newNotifications) {
-                                    registration.showNotification(newNotifications[key].name + ' möchte dich treffen!',
-                                        {
-                                            icon: "https://fabianwilms.github.io/anwctrl/images/touch/android-icon-192x192.png",
-                                            body: 'Gesendet am ' +
-                                                document.querySelector('anwctrl-app')._toDateString(newNotifications[key].date),
-                                            badge: "https://fabianwilms.github.io/anwctrl/images/touch/notification.png",
-                                            vibrate: [300, 100, 300]
-                                        });
-                                }
-                            });
-                        }
-                    });
-
-                    this.lastNObj = newNObj;
-                }
-            }
-
-            _arrayToObject(arrayObject) {
-                var retObj = {};
-                for (var i in arrayObject) {
-                    retObj[arrayObject[i].$key] = {
-                        name: arrayObject[i].name,
-                        date: arrayObject[i].date
-                    }
-                }
-                return retObj;
-            }
-
-            _getDiff(obj1, obj2) {
-                var larger, diff = {};
-
-                if (Object.keys(obj1).length > Object.keys(obj2).length) {
-                    larger = obj1;
-                } else if (Object.keys(obj2).length > Object.keys(obj1).length) {
-                    larger = obj2;
-                } else {
-                    return diff;
-                }
-
-                for (var key in larger) {
-                    if (obj1.hasOwnProperty(key) && obj2.hasOwnProperty(key)) {
-                        // do nothing
-                    } else {
-                        diff[key] = obj1.hasOwnProperty ? obj1[key] : obj2[key];
-                    }
-                }
-
-                return diff;
+            _delete(event) {
+                this.set('secondifies.' + event.detail, null);
             }
 
             _loginGithub() {
@@ -396,35 +316,14 @@
                 this.set('selectedAnwesenheit.until', newUntil);
             }
 
-            _asArrayByUser(obj, selectedUser) {
-                if (typeof obj != 'undefined') {
-                    if (typeof obj[selectedUser] != 'undefined') {
-                        return this._asArray(obj[selectedUser]);
-                    }
-                }
-            }
-
             _asArray(obj) {
                 return Object.keys(obj).map(function (key) {
                     return { key: key, value: obj[key] };
                 });
             }
 
-            _getUser(anwesenheiten, selected) {
-                return anwesenheiten[selected];
-            }
-
             _toggleDrawer(event) {
                 this.$.drawer.toggle();
-            }
-
-
-            _toDateString(dateString) {
-                var d = new Date(dateString);
-                var dayName = this.i18nObject.weekdays[d.getDay()];
-                var date = d.getDay() + "." + d.getMonth() + "." + d.getFullYear();
-                var time = d.getHours() + ":" + d.getMinutes() + " Uhr";
-                return dayName + ", " + date + " um " + time;
             }
         }
 
