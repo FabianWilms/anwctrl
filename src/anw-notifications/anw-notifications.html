@@ -1,10 +1,27 @@
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
 <link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../../bower_components/paper-item/paper-icon-item.html">
-
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 
 <dom-module id="anw-notifications">
     <template>
+        <style include="iron-flex iron-flex-alignment"></style>
+        <style>
+            .wrapper {
+                height: 100%;
+            }
+
+            h1 {
+                text-align: center;
+            }
+
+            .emoji {
+                text-align: center;
+                font-size: 64px;
+            }
+        </style>
+
+
         <template is="dom-repeat" items="[[notifies]]">
             <paper-icon-item>
                 <paper-icon-button icon="clear" title="Löschen" slot="item-icon" on-tap="_delete" data-item$="{{item}}">
@@ -17,6 +34,14 @@
                 </paper-item-body>
             </paper-icon-item>
         </template>
+
+        <template is="dom-if" if="[[!notifies.length]]">
+            <div class="layout vertical center-justified wrapper">
+                <span class="emoji">☹️</span>
+                <h1>Keiner will dich sehen</h1>
+            </div>
+        </template>
+
     </template>
     <script>
         /**
@@ -34,7 +59,6 @@
                 };
             }
 
-
             static get observers() {
                 return [
                     '_sendNotification(notifies.*)'
@@ -48,7 +72,7 @@
 
             _delete(event) {
                 const item = JSON.parse(event.target.dataset.item);
-                this.dispatchEvent(new CustomEvent('delete', { detail: item.$key}));
+                this.dispatchEvent(new CustomEvent('delete', { detail: item.$key }));
             }
 
             _sendNotification(newNData) {
