@@ -90,7 +90,7 @@
 
             paper-card {
                 margin: 8px;
-
+                background: white;
                 --paper-card-actions: {
                     border-top: 1px solid #fafafa;
                 }
@@ -128,9 +128,21 @@
                 color: var(--paper-red-400);
             }
 
+            .state[state="3"] {
+                color: var(--paper-indigo-200);
+            }
+
             iron-icon {
                 color: var(--secondary-text-color);
                 padding-right: 8px;
+            }
+
+            #inputMessage {
+                margin-right: 16px;
+            }
+
+            .emoji {
+                width: 80px;
             }
         </style>
 
@@ -157,19 +169,19 @@
                 <paper-badge for="btn" label="[[notifies.length]]"></paper-badge>
                 <paper-progress visible="{{gesamtAnwesenheiten.sebastian}}" indeterminate="{{!gesamtAnwesenheiten.sebastian}}" bottom-item></paper-progress>
             </app-toolbar>
+            
+            <template is="dom-if" if="{{user}}">
+                <paper-tabs attr-for-selected="value" selected="{{selectedUser}}" selected="0" scrollable>
+                    <template is="dom-repeat" items="[[_asArray(gesamtAnwesenheiten)]]">
+                        <paper-tab value$="{{item.key}}">{{item.value.name}}</paper-tab>
+                    </template>
+                </paper-tabs>
+            </template>
         </app-header>
 
         <app-drawer id="drawer" align="end" swipe-open>
             <anw-notifications on-delete="_delete" notifies={{notifies}}></anw-notificiations>
         </app-drawer>
-
-        <template is="dom-if" if="{{user}}">
-            <paper-tabs attr-for-selected="value" selected="{{selectedUser}}" selected="0" scrollable>
-                <template is="dom-repeat" items="[[_asArray(gesamtAnwesenheiten)]]">
-                    <paper-tab value$="{{item.key}}">{{item.value.name}}</paper-tab>
-                </template>
-            </paper-tabs>
-        </template>
 
         <div class="layout horizontal center-justified">
             <div class="layout vertical main-content">
@@ -179,14 +191,31 @@
                         <anw-single person={{selectedAnwesenheit}}>
                         </anw-single>
 
-                        <paper-card elevation=3>
+                        <div class="layout horizontal full-width">
+                            <paper-button on-tap="_clickBtn" raised class="state flex" state=0>Anwesend</paper-button>
+                            <paper-button on-tap="_clickBtn" raised class="state flex" state=1>Im Haus unterwegs</paper-button>
+                            <paper-button on-tap="_clickBtn" raised class="state flex" state=2>Abwesend</paper-button>
+                            <paper-button on-tap="_clickBtn" raised class="state flex" state=3>Telearbeit</paper-button>
+                        </div>
+
+                        <paper-card>
                             <div class="card-content">
-                                <paper-input id="inputMessage" label="Message" always-float-label></paper-input>
+                                <div class="layout horizontal">
+                                    <paper-input class="flex" id="inputMessage" label="Message" always-float-label></paper-input>
+                                    <paper-input
+                                        id="inputEmoji" 
+                                        class="emoji" 
+                                        label="Emoji"
+                                        max-lenth=1
+                                        always-float-label>                                   
+                                    </paper-input>
+                                </div>
                                 <div>Status</div>
                                 <paper-radio-group id="inputStatus" selected="{{curVal}}">
-                                    <paper-radio-button name="0">Anwesend</paper-radio-button>
-                                    <paper-radio-button name="1">Unterwegs</paper-radio-button>
-                                    <paper-radio-button name="2">Abwesend</paper-radio-button>
+                                    <paper-radio-button name="0">Anwesend</paper-radio-button><br>
+                                    <paper-radio-button name="1">Unterwegs</paper-radio-button><br>
+                                    <paper-radio-button name="2">Abwesend</paper-radio-button><br>
+                                    <paper-radio-button name="3">Telearbeit</paper-radio-button><br>
                                 </paper-radio-group>
                                 <vaadin-date-picker-light class="full-width" attr-for-value="value" i18n=[[i18nObject]]>
                                     <paper-input id="inputUntil" label="Gültig bis (einschließlich)" always-float-label>
@@ -198,11 +227,6 @@
                             </div>
                         </paper-card>
 
-                        <div class="layout horizontal full-width">
-                            <paper-button on-tap="_clickBtn" raised class="state flex" state=0>Anwesend</paper-button>
-                            <paper-button on-tap="_clickBtn" raised class="state flex" state=1>Im Haus unterwegs</paper-button>
-                            <paper-button on-tap="_clickBtn" raised class="state flex" state=2>abwesend</paper-button>
-                        </div>
                     </template>
                 </template>
 
@@ -307,6 +331,8 @@
                     this._changeState(1, "Im Haus unterwegs", "");
                 } else if (outerHTML.includes('state="2"')) {
                     this._changeState(2, "Abwesend", "");
+                } else if (outerHTML.includes('state="3"')) {
+                    this._changeState(3, "Telearbeit", "");
                 }
             }
 

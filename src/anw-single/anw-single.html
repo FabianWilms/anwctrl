@@ -39,6 +39,10 @@
       paper-card[state="2"] {
         background-color: var(--paper-red-400);
       }
+
+      paper-card[state="3"] {
+        background-color: var(--paper-indigo-200);
+      }
     </style>
 
     <style include="iron-flex iron-flex-alignment"></style>
@@ -62,6 +66,12 @@
               <b>Message</b>
             </td>
             <td>[[person.message]]</td>
+          </tr>
+          <tr>
+            <td class="fieldname">
+              <b>Emoji</b>
+            </td>
+            <td>[[person.emoji]]</td>
           </tr>
           <tr>
             <td class="fieldname">
