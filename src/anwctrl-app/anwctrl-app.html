@@ -214,8 +214,8 @@
                                 <div class="layout horizontal">
                                     <paper-input class="flex" id="inputMessage" label="Message" always-float-label></paper-input>
                                     <paper-input
-                                        id="inputEmoji" 
-                                        class="emoji" 
+                                        id="inputEmoji"
+                                        class="emoji"
                                         label="Emoji"
                                         always-float-label>                                   
                                     </paper-input>
@@ -227,7 +227,7 @@
                                     <paper-radio-button name="2">Abwesend</paper-radio-button><br>
                                     <paper-radio-button name="3">Telearbeit</paper-radio-button><br>
                                 </paper-radio-group>
-                                <vaadin-date-picker-light class="full-width" attr-for-value="value" i18n=[[i18nObject]]>
+                                <vaadin-date-picker-light id="datePicker" class="full-width" attr-for-value="value" i18n=[[i18nObject]]>
                                     <paper-input id="inputUntil" label="Gültig bis (einschließlich)" always-float-label>
                                     </paper-input>
                                 </vaadin-date-picker-light>
@@ -335,6 +335,7 @@
                 inpemoji.value = "";
                 inpstatus.value = "";
                 inpuntil.value = "";
+                this.shadowRoot.querySelector('#datePicker').value="";
             }
 
             _clickBtn(event) {
