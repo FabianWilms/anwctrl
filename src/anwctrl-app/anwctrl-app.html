@@ -39,6 +39,7 @@
             .main-content {
                 max-width: 460px;
                 width: 100%;
+                padding-top: 100px;
             }
 
             .loading {
@@ -72,9 +73,14 @@
                 color: white;
             }
 
+            app-header {
+                @apply --layout-fixed-top;
+                z-index: 998;
+            }
+
             app-drawer {
                 z-index: 999;
-                top: 64px;
+                top: 112px;
                 --app-drawer-content-container: {
                     padding: 0px;
                     background-color: #eee;
@@ -116,6 +122,10 @@
                 width: 100%;
             }
 
+            .state {
+                min-width: 200px;
+            }
+
             .state[state="0"] {
                 color: var(--paper-teal-400);
             }
@@ -129,7 +139,7 @@
             }
 
             .state[state="3"] {
-                color: var(--paper-indigo-200);
+                color: var(--paper-grey-500);
             }
 
             iron-icon {
@@ -162,7 +172,7 @@
 
         <app-localstorage-document key="selectedUser" data="{{selectedUser}}"></app-localstorage-document>
 
-        <app-header>
+        <app-header reveals>
             <app-toolbar>
                 <div main-title>Anwesenheits Controller</div>
                 <paper-icon-button id="btn" icon="inbox" on-tap="_toggleDrawer"></paper-icon-button>
@@ -191,7 +201,7 @@
                         <anw-single person={{selectedAnwesenheit}}>
                         </anw-single>
 
-                        <div class="layout horizontal full-width">
+                        <div class="layout horizontal wrap">
                             <paper-button on-tap="_clickBtn" raised class="state flex" state=0>Anwesend</paper-button>
                             <paper-button on-tap="_clickBtn" raised class="state flex" state=1>Im Haus unterwegs</paper-button>
                             <paper-button on-tap="_clickBtn" raised class="state flex" state=2>Abwesend</paper-button>
@@ -206,7 +216,6 @@
                                         id="inputEmoji" 
                                         class="emoji" 
                                         label="Emoji"
-                                        max-lenth=1
                                         always-float-label>                                   
                                     </paper-input>
                                 </div>
@@ -314,11 +323,15 @@
             }
 
             _saveCustom() {
-                let inpmessage = this.shadowRoot.querySelector('#inputMessage');
-                let inpstatus = this.shadowRoot.querySelector('#inputStatus');
-                let inpuntil = this.shadowRoot.querySelector('#inputUntil');
-                this._changeState(inpstatus.selected, inpmessage.value, inpuntil.value);
+                var inpmessage = this.shadowRoot.querySelector('#inputMessage');
+                var inpemoji = this.shadowRoot.querySelector('#inputEmoji');
+                var inpstatus = this.shadowRoot.querySelector('#inputStatus');
+                var inpuntil = this.shadowRoot.querySelector('#inputUntil');
+                console.log(inpmessage.value);
+                console.log(inpemoji.value);
+                this._changeState(inpstatus.selected, inpmessage.value, inpemoji.value, inpuntil.value);
                 inpmessage.value = "";
+                inpemoji.value = "";
                 inpstatus.value = "";
                 inpuntil.value = "";
             }
@@ -326,19 +339,20 @@
             _clickBtn(event) {
                 var outerHTML = event.target.outerHTML;
                 if (outerHTML.includes('state="0"')) {
-                    this._changeState(0, "Anwesend", "");
+                    this._changeState(0, "Anwesend", "", "");
                 } else if (outerHTML.includes('state="1"')) {
-                    this._changeState(1, "Im Haus unterwegs", "");
+                    this._changeState(1, "Im Haus unterwegs", "", "");
                 } else if (outerHTML.includes('state="2"')) {
-                    this._changeState(2, "Abwesend", "");
+                    this._changeState(2, "Abwesend", "", "");
                 } else if (outerHTML.includes('state="3"')) {
-                    this._changeState(3, "Telearbeit", "");
+                    this._changeState(3, "Telearbeit", "", "");
                 }
             }
 
-            _changeState(newStatus, newMessage, newUntil) {
+            _changeState(newStatus, newMessage, newEmoji, newUntil) {
                 this.set('selectedAnwesenheit.status', newStatus);
                 this.set('selectedAnwesenheit.message', newMessage);
+                this.set('selectedAnwesenheit.emoji', newEmoji);
                 this.set('selectedAnwesenheit.until', newUntil);
             }
 
