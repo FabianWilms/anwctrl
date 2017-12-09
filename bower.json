@@ -22,7 +22,8 @@
     "paper-badge": "PolymerElements/paper-badge#^2.0.0",
     "paper-radio-group": "PolymerElements/paper-radio-group#^2.0.0",
     "paper-radio-button": "PolymerElements/paper-radio-button#^2.0.0",
-    "paper-tabs": "PolymerElements/paper-tabs#^2.0.0"
+    "paper-tabs": "PolymerElements/paper-tabs#^2.0.0",
+    "vaadin-material-theme": "vaadin/vaadin-material-theme#^0.3.0"
   },
   "devDependencies": {
     "web-component-tester": "Polymer/web-component-tester#^6.0.0",
