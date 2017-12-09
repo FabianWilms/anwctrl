@@ -21,10 +21,10 @@
 <link rel="import" href="../../bower_components/polymerfire/firebase-app.html">
 <link rel="import" href="../../bower_components/polymerfire/firebase-document.html">
 <link rel="import" href="../../bower_components/polymerfire/firebase-query.html">
-<link rel="import" href="../../bower_components/polymerfire/firebase-auth.html">
 <link rel="import" href="../../bower_components/app-storage/app-localstorage/app-localstorage-document.html">
 <link rel="import" href="../../bower_components/app-layout/app-layout.html">
 
+<link rel="import" href="../auth-element.html">
 <link rel="import" href="../../styles/app-theme.html">
 <link rel="import" href="../anw-single/anw-single.html">
 <link rel="import" href="../anw-notifications/anw-notifications.html">
@@ -169,8 +169,6 @@
 
         <firebase-query path="notify/[[selectedUser]]" data="{{notifies}}"></firebase-query>
 
-        <firebase-auth id="auth" user="{{user}}" on-error="_errorHandler"></firebase-auth>
-
         <app-localstorage-document key="selectedUser" data="{{selectedUser}}"></app-localstorage-document>
 
         <app-header reveals>
@@ -196,6 +194,9 @@
 
         <div class="layout horizontal center-justified">
             <div class="layout vertical main-content">
+
+                <auth-element user={{user}}></auth-element>
+
                 <template is="dom-if" if="{{user}}">
                     <template is="dom-if" if="{{selectedUser}}">
 
@@ -239,11 +240,6 @@
 
                     </template>
                 </template>
-
-                <template is="dom-if" if="{{!user}}">
-                    <paper-button on-tap="_loginGithub" raised>Login Github</paper-button>
-                    <paper-button on-tap="_loginGoogle" raised>Login Google</paper-button>
-                </template>
             </div>
         </div>
 
@@ -262,7 +258,6 @@
                     gesamtAnwesenheiten: Object,
                     notifies: Array,
                     selectedUser: String,
-                    user: Object,
                     i18nObject: {
                         type: Object,
                         value: {
@@ -297,30 +292,6 @@
 
             _delete(event) {
                 this.set('secondifies.' + event.detail, null);
-            }
-
-            _loginGithub() {
-                this.$.auth.signInWithRedirect("github")
-                    .then(function (response) {
-                        this._errorHandler(response);
-                    })
-                    .catch(function (error) {
-                        this._errorHandler(error);
-                    });
-            }
-
-            _loginGoogle() {
-                this.$.auth.signInWithRedirect("google")
-                    .then(function (response) {
-                        this._errorHandler(response);
-                    })
-                    .catch(function (error) {
-                        this._errorHandler(error);
-                    });
-            }
-
-            _errorHandler(error) {
-                console.log(error);
             }
 
             _saveCustom() {
@@ -368,7 +339,6 @@
                 this.$.drawer.toggle();
             }
         }
-
 
         window.customElements.define(AnwctrlApp.is, AnwctrlApp);
     </script>
