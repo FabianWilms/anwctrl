@@ -1,0 +1,103 @@
+<link rel="import"
+      href="../bower_components/polymer/polymer-element.html">
+<link rel="import"
+      href="../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import"
+      href="../bower_components/paper-button/paper-button.html">
+
+<dom-module id="anw-quickselect">
+    <template>
+        <style include="iron-flex iron-flex-alignment"></style>
+        <style>
+            :host {
+                display: block
+            }
+
+            .state {
+                min-width: 150px;
+                margin: 8px;
+            }
+
+            .state[state="0"] {
+                color: var(--anw-state0-color);
+            }
+
+            .state[state="1"] {
+                color: var(--anw-state1-color);
+            }
+
+            .state[state="2"] {
+                color: var(--anw-state2-color);
+            }
+
+            .state[state="3"] {
+                color: var(--anw-state3-color);
+            }
+        </style>
+
+
+        <div class="layout horizontal wrap">
+            <paper-button on-tap="_clickBtn"
+                          raised
+                          class="state flex"
+                          state=0>Anwesend</paper-button>
+            <paper-button on-tap="_clickBtn"
+                          raised
+                          class="state flex"
+                          state=1>Im Haus unterwegs</paper-button>
+            <paper-button on-tap="_clickBtn"
+                          raised
+                          class="state flex"
+                          state=2>Abwesend</paper-button>
+            <paper-button on-tap="_clickBtn"
+                          raised
+                          class="state flex"
+                          state=3>Telearbeit</paper-button>
+        </div>
+
+
+    </template>
+
+    <script>
+        /**
+         * `AnwQuickselect` Description
+         *
+         * @summary ShortDescription.
+         * @customElement
+         * @polymer
+         * @extends {Polymer.Element}
+         */
+        class AnwQuickselect extends Polymer.Element {
+            /**
+             * String providing the tag name to register the element under.
+             */
+            static get is() {
+                return 'anw-quickselect';
+            }
+
+            _clickBtn(event) {
+                var state = parseInt(event.target.getAttribute("state"));
+                var eventData = {};
+                switch(state) {
+                    case 0:
+                        eventData.message = "Anwesend";
+                        break;
+                    case 1:
+                        eventData.message = "Im Haus unterwegs";
+                        break;
+                    case 2:
+                        eventData.message = "Abwesend";
+                        break;
+                    case 3:
+                        eventData.message = "Telearbeit";
+                        break;
+                }
+                eventData.status = state;
+                this.dispatchEvent(new CustomEvent('klick', {detail: eventData}));
+            }
+
+        }
+
+        window.customElements.define(AnwQuickselect.is, AnwQuickselect);
+    </script>
+</dom-module>

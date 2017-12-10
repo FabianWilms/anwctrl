@@ -22,6 +22,7 @@
 <link rel="import" href="auth-element.html">
 <link rel="import" href="../styles/app-theme.html">
 <link rel="import" href="anw-single.html">
+<link rel="import" href="anw-quickselect.html">
 <link rel="import" href="anw-notifications/anw-notifications.html">
 
 
@@ -118,26 +119,6 @@
                 width: 100%;
             }
 
-            .state {
-                min-width: 200px;
-            }
-
-            .state[state="0"] {
-                color: var(--paper-teal-400);
-            }
-
-            .state[state="1"] {
-                color: var(--paper-amber-400);
-            }
-
-            .state[state="2"] {
-                color: var(--paper-red-400);
-            }
-
-            .state[state="3"] {
-                color: var(--paper-grey-500);
-            }
-
             iron-icon {
                 color: var(--secondary-text-color);
                 padding-right: 8px;
@@ -204,12 +185,7 @@
                         <anw-single person={{selectedAnwesenheit}}>
                         </anw-single>
 
-                        <div class="layout horizontal wrap">
-                            <paper-button on-tap="_clickBtn" raised class="state flex" state=0>Anwesend</paper-button>
-                            <paper-button on-tap="_clickBtn" raised class="state flex" state=1>Im Haus unterwegs</paper-button>
-                            <paper-button on-tap="_clickBtn" raised class="state flex" state=2>Abwesend</paper-button>
-                            <paper-button on-tap="_clickBtn" raised class="state flex" state=3>Telearbeit</paper-button>
-                        </div>
+                        <anw-quickselect on-klick="_updateStatus"></anw-quickselect>
 
                         <paper-card>
                             <div class="card-content">
@@ -310,17 +286,10 @@
                 this.shadowRoot.querySelector('#datePicker').value="";
             }
 
-            _clickBtn(event) {
-                var outerHTML = event.target.outerHTML;
-                if (outerHTML.includes('state="0"')) {
-                    this._changeState(0, "Anwesend", "", "");
-                } else if (outerHTML.includes('state="1"')) {
-                    this._changeState(1, "Im Haus unterwegs", "", "");
-                } else if (outerHTML.includes('state="2"')) {
-                    this._changeState(2, "Abwesend", "", "");
-                } else if (outerHTML.includes('state="3"')) {
-                    this._changeState(3, "Telearbeit", "", "");
-                }
+            _updateStatus(event) {
+                const data = event.detail;
+                console.log(data);
+                this._changeState(data.status, data.message, data.emoji, data.until);
             }
 
             _changeState(newStatus, newMessage, newEmoji, newUntil) {
