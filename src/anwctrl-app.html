@@ -1,0 +1,204 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/paper-styles/default-theme.html">
+<link rel="import" href="../bower_components/paper-badge/paper-badge.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../bower_components/paper-tabs/paper-tab.html">
+<link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../bower_components/neon-animation/web-animations.html">
+<link rel="import" href="../bower_components/polymerfire/firebase-app.html">
+<link rel="import" href="../bower_components/polymerfire/firebase-document.html">
+<link rel="import" href="../bower_components/polymerfire/firebase-query.html">
+<link rel="import" href="../bower_components/app-storage/app-localstorage/app-localstorage-document.html">
+<link rel="import" href="../bower_components/app-layout/app-layout.html">
+<link rel="import" href="../bower_components/paper-progress/paper-progress.html">
+
+<link rel="import" href="auth-element.html">
+<link rel="import" href="../styles/app-theme.html">
+<link rel="import" href="anw-single.html">
+<link rel="import" href="anw-quickselect.html">
+<link rel="import" href="anw-customselect.html">
+<link rel="import" href="anw-notifications/anw-notifications.html">
+
+
+<dom-module id="anwctrl-app">
+    <template>
+        <style>
+            :host {
+                display: block;
+            }
+
+            .main-content {
+                max-width: 460px;
+                width: 100%;
+                padding-top: 100px;
+            }
+
+            paper-tabs {
+                --paper-tabs-selection-bar-color: #fff;
+                --paper-tab-ink: #fff;
+                --paper-tabs: {
+                    background-color: #448aff;
+                    color: #fff;
+                }
+            }
+
+            paper-badge {
+                --paper-badge-background: rgba(0, 0, 0, 0);
+                --paper-badge-text-color: #fff;
+            }
+
+            paper-badge[aria-label="0"] {
+                visibility: hidden;
+            }
+
+            app-toolbar {
+                background-color: #448aff;
+                color: white;
+            }
+
+            app-header {
+                @apply --layout-fixed-top;
+                z-index: 998;
+            }
+
+            app-drawer {
+                z-index: 999;
+                top: 112px;
+                --app-drawer-content-container: {
+                    padding: 0px;
+                    background-color: #eee;
+                }
+            }
+
+            paper-progress {
+                width: 100%;
+                --paper-progress-active-color: #448aff;
+                --paper-progress-container-color: #4fcfff;
+            }
+
+            anw-single {
+                padding: 32px 8px 8px 8px;
+            }
+
+            anw-customselect {
+                padding: 8px 8px 32px 8px;
+            }
+
+            iron-icon {
+                color: var(--secondary-text-color);
+                padding-right: 8px;
+            }
+
+        </style>
+
+        <style include="iron-flex iron-flex-alignment"></style>
+
+        <firebase-app auth-domain="anwesenheit-550a6.firebaseapp.com" database-url="https://anwesenheit-550a6.firebaseio.com" api-key="AIzaSyCMOpqIHJ0QG5LddQ-DzCQ7bG6RJaZsKHQ"
+            project-id="anwesenheit-550a6" storage-bucket="anwesenheit-550a6.appspot.com" messaging-sender-id="44085346030">
+        </firebase-app>
+
+        <firebase-document path="anwesenheiten" data="{{gesamtAnwesenheiten}}"></firebase-document>
+        <firebase-document path="anwesenheiten/[[selectedUser]]" data="{{selectedAnwesenheit}}"></firebase-document>
+        <firebase-document path="notify/[[selectedUser]]" data="{{secondifies}}"></firebase-document>
+
+        <firebase-query path="notify/[[selectedUser]]" data="{{notifies}}"></firebase-query>
+
+        <app-localstorage-document key="selectedUser" data="{{selectedUser}}"></app-localstorage-document>
+
+        <app-header reveals>
+            <app-toolbar>
+                <div main-title>Anwesenheits Controller</div>
+                <paper-icon-button id="btn" icon="inbox" on-tap="_toggleDrawer"></paper-icon-button>
+                <paper-badge for="btn" label="[[notifies.length]]"></paper-badge>
+            </app-toolbar>
+            
+            <paper-tabs attr-for-selected="value" selected="{{selectedUser}}" selected="0" scrollable>
+                <template is="dom-if" if="{{user}}">
+                    <template is="dom-repeat" items="[[_asArray(gesamtAnwesenheiten)]]">
+                        <paper-tab value$="{{item.key}}">{{item.value.name}}</paper-tab>
+                    </template>
+                </template>     
+            </paper-tabs>
+            
+            <paper-progress 
+                hidden="{{gesamtAnwesenheiten.sebastian}}" 
+                indeterminate="{{!gesamtAnwesenheiten.sebastian}}" 
+                bottom-item>
+            </paper-progress>
+            
+        </app-header>
+
+        <app-drawer id="drawer" align="end" swipe-open>
+            <anw-notifications on-delete="_delete" notifies={{notifies}}></anw-notificiations>
+        </app-drawer>
+
+        <div class="layout horizontal center-justified">
+            <div class="layout vertical main-content">
+
+                <auth-element user={{user}}></auth-element>
+
+                <template is="dom-if" if="{{user}}">
+                    <template is="dom-if" if="{{selectedUser}}">
+
+                        <anw-single person={{selectedAnwesenheit}}></anw-single>
+
+                        <anw-quickselect on-klick="_updateStatus"></anw-quickselect>
+
+                        <anw-customselect on-save="_updateStatus"></anw-customselect>
+
+
+                    </template>
+                </template>
+            </div>
+        </div>
+
+    </template>
+
+    <script>
+        /**
+     * @customElement
+     * @polymer
+     */
+        class AnwctrlApp extends Polymer.Element {
+            static get is() { return 'anwctrl-app'; }
+            static get properties() {
+                return {
+                    lastNObj: Object,
+                    gesamtAnwesenheiten: Object,
+                    notifies: Array,
+                    selectedUser: String
+                };
+            }
+
+            _delete(event) {
+                this.set('secondifies.' + event.detail, null);
+            }
+
+            _updateStatus(event) {
+                const data = event.detail;
+                console.log(data);
+                this._changeState(data.status, data.message, data.emoji, data.until);
+            }
+
+            _changeState(newStatus, newMessage, newEmoji, newUntil) {
+                this.set('selectedAnwesenheit.status', newStatus);
+                this.set('selectedAnwesenheit.message', newMessage);
+                this.set('selectedAnwesenheit.emoji', newEmoji);
+                this.set('selectedAnwesenheit.until', newUntil);
+            }
+
+            _asArray(obj) {
+                return Object.keys(obj).map(function (key) {
+                    return { key: key, value: obj[key] };
+                });
+            }
+
+            _toggleDrawer(event) {
+                this.$.drawer.toggle();
+            }
+        }
+
+        window.customElements.define(AnwctrlApp.is, AnwctrlApp);
+    </script>
+</dom-module>

@@ -1,0 +1,105 @@
+<link rel="import"
+      href="../bower_components/polymer/polymer-element.html">
+<link rel="import"
+      href="../bower_components/polymerfire/firebase-auth.html">
+<link rel="import"
+      href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import"
+      href="../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+
+<dom-module id="auth-element">
+    <template>
+        <style include="iron-flex iron-flex-alignment"></style>
+        <style>
+            :host {
+                display: block
+            }
+
+            h1 {
+                text-align: center;
+            }
+
+            paper-icon-button {
+                height: 94px;
+                width: 94px;
+                margin: 16px;
+            }
+        </style>
+
+        <firebase-auth id="auth"
+                       user="{{user}}"
+                       on-error="_errorHandler"></firebase-auth>
+
+        <template is="dom-if"
+                  if="{{!user}}">
+            <div class="layout vertical center-justified">
+
+                <h1>Bitte wähle einen Login-Provider deiner Wahl</h1>
+
+                <div class="layout horizontal center-justified">
+                    <paper-icon-button src="../images/touch/github_logo.png"
+                                       on-tap="_loginGithub"
+                                       title="Login mit Github"
+                                       raised>
+                    </paper-icon-button>
+                    <paper-icon-button src="../images/touch/google_logo.png"
+                                       on-tap="_loginGoogle"
+                                       title="Login mit Google"
+                                       raised>
+                    </paper-icon-button>
+                    </paper-icon-button>
+                </div>
+            </div>
+        </template>
+
+    </template>
+
+    <script>
+        class AuthElement extends Polymer.Element {
+            /**
+             * String providing the tag name to register the element under.
+             */
+            static get is() {
+                return 'auth-element';
+            }
+
+            /**
+             * Object describing property-related metadata used by Polymer features
+             */
+            static get properties() {
+                return {
+                    user: {
+                        type: Object,
+                        notify: true
+                    }
+                };
+            }
+
+            _loginGithub() {
+                this.$.auth.signInWithRedirect("github")
+                    .then(function (response) {
+                        this._errorHandler(response);
+                    })
+                    .catch(function (error) {
+                        this._errorHandler(error);
+                    });
+            }
+
+            _loginGoogle() {
+                this.$.auth.signInWithRedirect("google")
+                    .then(function (response) {
+                        this._errorHandler(response);
+                    })
+                    .catch(function (error) {
+                        this._errorHandler(error);
+                    });
+            }
+
+            _errorHandler(error) {
+                console.log(error);
+            }
+        }
+
+        window.customElements.define(AuthElement.is, AuthElement);
+    </script>
+</dom-module>
