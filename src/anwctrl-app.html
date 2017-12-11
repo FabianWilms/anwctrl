@@ -1,12 +1,6 @@
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
 <link rel="import" href="../bower_components/paper-styles/default-theme.html">
-<link rel="import" href="../bower_components/paper-input/paper-input.html">
-<link rel="import" href="../bower_components/vaadin-material-theme/vaadin-date-picker.html">
-<link rel="import" href="../bower_components/vaadin-date-picker/vaadin-date-picker-light.html">
-<link rel="import" href="../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../bower_components/paper-badge/paper-badge.html">
-<link rel="import" href="../bower_components/paper-radio-group/paper-radio-group.html">
-<link rel="import" href="../bower_components/paper-radio-button/paper-radio-button.html">
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
 <link rel="import" href="../bower_components/paper-tabs/paper-tab.html">
@@ -23,6 +17,7 @@
 <link rel="import" href="../styles/app-theme.html">
 <link rel="import" href="anw-single.html">
 <link rel="import" href="anw-quickselect.html">
+<link rel="import" href="anw-customselect.html">
 <link rel="import" href="anw-notifications/anw-notifications.html">
 
 
@@ -37,14 +32,6 @@
                 max-width: 460px;
                 width: 100%;
                 padding-top: 100px;
-            }
-
-            .loading {
-                height: 100%;
-            }
-
-            .full-width {
-                width: 100%;
             }
 
             paper-tabs {
@@ -82,7 +69,6 @@
                     padding: 0px;
                     background-color: #eee;
                 }
-                ;
             }
 
             paper-progress {
@@ -91,32 +77,12 @@
                 --paper-progress-container-color: #4fcfff;
             }
 
-            paper-card {
-                margin: 8px;
-                background: white;
-                --paper-card-actions: {
-                    border-top: 1px solid #fafafa;
-                }
-            }
-
             anw-single {
                 padding: 32px 8px 8px 8px;
             }
 
-            paper-button {
-                margin: 8px;
-            }
-
-            paper-slider {
-                --paper-slider-pin-color: #000;
-                --paper-slider-active-color: #000;
-                --paper-slider-container-color: #000;
-                --paper-slider-knob-color: #000;
-                --paper-slider-disabled-active-color: #000;
-                --paper-slider-knob-start-border-color: #000;
-                --paper-slider-knob-start-color: #000;
-                --paper-slider-pin-start-color: #000;
-                width: 100%;
+            anw-customselect {
+                padding: 8px 8px 32px 8px;
             }
 
             iron-icon {
@@ -124,13 +90,6 @@
                 padding-right: 8px;
             }
 
-            #inputMessage {
-                margin-right: 16px;
-            }
-
-            .emoji {
-                width: 80px;
-            }
         </style>
 
         <style include="iron-flex iron-flex-alignment"></style>
@@ -182,38 +141,12 @@
                 <template is="dom-if" if="{{user}}">
                     <template is="dom-if" if="{{selectedUser}}">
 
-                        <anw-single person={{selectedAnwesenheit}}>
-                        </anw-single>
+                        <anw-single person={{selectedAnwesenheit}}></anw-single>
 
                         <anw-quickselect on-klick="_updateStatus"></anw-quickselect>
 
-                        <paper-card>
-                            <div class="card-content">
-                                <div class="layout horizontal">
-                                    <paper-input class="flex" id="inputMessage" label="Message" always-float-label></paper-input>
-                                    <paper-input
-                                        id="inputEmoji"
-                                        class="emoji"
-                                        label="Emoji"
-                                        always-float-label>                                   
-                                    </paper-input>
-                                </div>
-                                <div>Status</div>
-                                <paper-radio-group id="inputStatus" selected="{{curVal}}">
-                                    <paper-radio-button name="0">Anwesend</paper-radio-button><br>
-                                    <paper-radio-button name="1">Unterwegs</paper-radio-button><br>
-                                    <paper-radio-button name="2">Abwesend</paper-radio-button><br>
-                                    <paper-radio-button name="3">Telearbeit</paper-radio-button><br>
-                                </paper-radio-group>
-                                <vaadin-date-picker-light id="datePicker" class="full-width" attr-for-value="value" i18n=[[i18nObject]]>
-                                    <paper-input id="inputUntil" label="Gültig bis (einschließlich)" always-float-label>
-                                    </paper-input>
-                                </vaadin-date-picker-light>
-                            </div>
-                            <div class="card-actions">
-                                <paper-button class="state" state$="{{curVal}}" on-tap="_saveCustom">Speichern</paper-button>
-                            </div>
-                        </paper-card>
+                        <anw-customselect on-save="_updateStatus"></anw-customselect>
+
 
                     </template>
                 </template>
@@ -234,56 +167,12 @@
                     lastNObj: Object,
                     gesamtAnwesenheiten: Object,
                     notifies: Array,
-                    selectedUser: String,
-                    i18nObject: {
-                        type: Object,
-                        value: {
-                            monthNames: [
-                                'Januar', 'Februar', 'März', 'April', 'Mai',
-                                'Juni', 'Juli', 'August', 'September',
-                                'Oktober', 'November', 'Dezember'
-                            ],
-                            weekdays: [
-                                'Sonntag', 'Montag', 'Dienstag', 'Mittwoch',
-                                'Donnerstag', 'Freitag', 'Samstag'
-                            ],
-                            weekdaysShort: [
-                                'So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'
-                            ],
-                            firstDayOfWeek: 1,
-                            week: 'Woche',
-                            calendar: 'Kalender',
-                            clear: 'Leeren',
-                            today: 'Heute',
-                            cancel: 'Abbrechen',
-                            formatDate: d => {
-                                return ("0" + d.getDate()).slice(-2) + '.' + ("0" + (d.getMonth() + 1)).slice(-2) + '.' + d.getFullYear();
-                            },
-                            formatTitle: (monthName, fullYear) => {
-                                return monthName + ' ' + fullYear;
-                            }
-                        }
-                    }
+                    selectedUser: String
                 };
             }
 
             _delete(event) {
                 this.set('secondifies.' + event.detail, null);
-            }
-
-            _saveCustom() {
-                var inpmessage = this.shadowRoot.querySelector('#inputMessage');
-                var inpemoji = this.shadowRoot.querySelector('#inputEmoji');
-                var inpstatus = this.shadowRoot.querySelector('#inputStatus');
-                var inpuntil = this.shadowRoot.querySelector('#inputUntil');
-                console.log(inpmessage.value);
-                console.log(inpemoji.value);
-                this._changeState(inpstatus.selected, inpmessage.value, inpemoji.value, inpuntil.value);
-                inpmessage.value = "";
-                inpemoji.value = "";
-                inpstatus.value = "";
-                inpuntil.value = "";
-                this.shadowRoot.querySelector('#datePicker').value="";
             }
 
             _updateStatus(event) {
