@@ -4,9 +4,12 @@
       href="../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import"
       href="../bower_components/paper-button/paper-button.html">
+<link rel="import"
+      href="https://raw.githubusercontent.com/FabianWilms/anwesenheit/master/styles/anw-style.html">
 
 <dom-module id="anw-quickselect">
     <template>
+        <style include="anw-style"></style>
         <style include="iron-flex iron-flex-alignment"></style>
         <style>
             :host {
@@ -17,41 +20,25 @@
                 min-width: 150px;
                 margin: 8px;
             }
-
-            .state[state="0"] {
-                color: var(--anw-state0-color);
-            }
-
-            .state[state="1"] {
-                color: var(--anw-state1-color);
-            }
-
-            .state[state="2"] {
-                color: var(--anw-state2-color);
-            }
-
-            .state[state="3"] {
-                color: var(--anw-state3-color);
-            }
         </style>
 
 
         <div class="layout horizontal wrap">
             <paper-button on-tap="_clickBtn"
                           raised
-                          class="state flex"
+                          class="anw-state foreground flex"
                           state=0>Anwesend</paper-button>
             <paper-button on-tap="_clickBtn"
                           raised
-                          class="state flex"
+                          class="anw-state foreground  flex"
                           state=1>Im Haus unterwegs</paper-button>
             <paper-button on-tap="_clickBtn"
                           raised
-                          class="state flex"
+                          class="anw-state foreground  flex"
                           state=2>Abwesend</paper-button>
             <paper-button on-tap="_clickBtn"
                           raised
-                          class="state flex"
+                          class="anw-state foreground  flex"
                           state=3>Telearbeit</paper-button>
         </div>
 
@@ -78,7 +65,7 @@
             _clickBtn(event) {
                 var state = parseInt(event.target.getAttribute("state"));
                 var eventData = {};
-                switch(state) {
+                switch (state) {
                     case 0:
                         eventData.message = "Anwesend";
                         break;
@@ -93,7 +80,7 @@
                         break;
                 }
                 eventData.status = state;
-                this.dispatchEvent(new CustomEvent('klick', {detail: eventData}));
+                this.dispatchEvent(new CustomEvent('klick', { detail: eventData }));
             }
 
         }

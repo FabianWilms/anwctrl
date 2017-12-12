@@ -17,8 +17,12 @@
 <link rel="import"
       href="../bower_components/app-layout/app-layout.html">
 
+<link rel="import"
+      href="https://raw.githubusercontent.com/FabianWilms/anwesenheit/master/styles/anw-style.html">
+
 <dom-module id="anw-customselect">
     <template>
+        <style include="anw-style"></style>
         <style include="iron-flex iron-flex-alignment"></style>
         <style>
             :host {
@@ -47,22 +51,6 @@
 
             #inputEmoji {
                 width: 80px;
-            }
-
-            .state[state="0"] {
-                color: var(--anw-state0-color);
-            }
-
-            .state[state="1"] {
-                color: var(--anw-state1-color);
-            }
-
-            .state[state="2"] {
-                color: var(--anw-state2-color);
-            }
-
-            .state[state="3"] {
-                color: var(--anw-state3-color);
             }
         </style>
 
@@ -98,7 +86,7 @@
                 </vaadin-date-picker-light>
             </div>
             <div class="card-actions">
-                <paper-button class="state"
+                <paper-button class="anw-state foreground"
                               state$="[[_customState.status]]"
                               on-tap="_saveCustom">Speichern</paper-button>
             </div>
