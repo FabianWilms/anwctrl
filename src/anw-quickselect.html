@@ -80,6 +80,8 @@
                         break;
                 }
                 eventData.status = state;
+                eventData.until = "";
+                eventData.emoji = "";
                 this.dispatchEvent(new CustomEvent('klick', { detail: eventData }));
             }
 
