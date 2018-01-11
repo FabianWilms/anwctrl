@@ -37,45 +37,74 @@
                 margin: 8px;
             }
 
+            paper-time-input {
+                margin: 8px;
+            }
+
         </style>
 
         <paper-card>
             <div class="card-content">
                 <div>Zeiten</div>
-                <div>
-                    Montag:
-                    <paper-time-input label="Von" format="24" value="{{_customTimes.mon_start}}"></paper-time-input>
-                    bis
-                    <paper-time-input label="Bis" format="24" value="{{_customTimes.mon_end}}"></paper-time-input>
-                </div>
-                <br>
-                <div>
-                    Dienstag:
-                    <paper-time-input label="Von" format="24" value="{{_customTimes.tues_start}}"></paper-time-input>
-                     -
-                    <paper-time-input label="Bis" format="24" value="{{_customTimes.tues_end}}"></paper-time-input>
-                </div>
-                <br>
-                <div>
-                    Mittwoch:
-                    <paper-time-input label="Von" format="24" value="{{_customTimes.wed_start}}"></paper-time-input>
-                     -
-                    <paper-time-input label="Bis" format="24" value="{{_customTimes.wed_end}}"></paper-time-input>
-                </div>
-                <br>
-                <div>
-                    Donnerstag:
-                    <paper-time-input label="Von" format="24" value="{{_customTimes.thur_start}}"></paper-time-input>
-                     -
-                    <paper-time-input label="Bis" format="24" value="{{_customTimes.thur_end}}"></paper-time-input>
-                </div>
-                <br>
-                <div>
-                    Freitag:
-                    <paper-time-input label="Von" format="24" value="{{_customTimes.fri_start}}"></paper-time-input>
-                     -
-                    <paper-time-input label="Bis" format="24" value="{{_customTimes.fri_end}}"></paper-time-input>
-                </div>
+                <table>
+                    <tbody>
+                    <tr>
+                        <td>
+                           <b>Montag</b>
+                        </td>
+                        <td>
+                            <paper-time-input label="Von" format="24" value="{{_customTimes.mon_start}}"></paper-time-input>
+                        </td>
+                        <td>
+                            <paper-time-input label="Bis" format="24" value="{{_customTimes.mon_end}}"></paper-time-input>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>Dienstag</b>
+                        </td>
+                        <td>
+                            <paper-time-input label="Von" format="24" value="{{_customTimes.tues_start}}"></paper-time-input>
+                        </td>
+                        <td>
+                            <paper-time-input label="Bis" format="24" value="{{_customTimes.tues_end}}"></paper-time-input>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>Mittwoch</b>
+                        </td>
+                        <td>
+                            <paper-time-input label="Von" format="24" value="{{_customTimes.wed_start}}"></paper-time-input>
+                        </td>
+                        <td>
+                            <paper-time-input label="Bis" format="24" value="{{_customTimes.wed_end}}"></paper-time-input>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>Donnerstag</b>
+                        </td>
+                        <td>
+                            <paper-time-input label="Von" format="24" value="{{_customTimes.thur_start}}"></paper-time-input>
+                        </td>
+                        <td>
+                            <paper-time-input label="Bis" format="24" value="{{_customTimes.thur_end}}"></paper-time-input>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>Freitag</b>
+                        </td>
+                        <td>
+                            <paper-time-input label="Von" format="24" value="{{_customTimes.fri_start}}"></paper-time-input>
+                        </td>
+                        <td>
+                            <paper-time-input label="Bis" format="24" value="{{_customTimes.fri_end}}"></paper-time-input>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
                 <br>
             </div>
             <div class="card-actions">
@@ -100,22 +129,39 @@
                     _customTimes: {
                         type: Object,
                         value: {}
+                    },
+                    _timeTest: {
+                        type: RegExp,
+                        value: RegExp('[0-24]:[0-59]')
                     }
                 };
             }
 
             _saveCustom() {
+
                 var eventData = {
-                    0: this._customTimes.mon_start + '-' + this._customTimes.mon_end,
-                    1: this._customTimes.tues_start + '-' + this._customTimes.tues_end,
-                    2: this._customTimes.wed_start + '-' + this._customTimes.wed_end,
-                    3: this._customTimes.thur_start + '-' + this._customTimes.thur_end,
-                    4: this._customTimes.fri_start + '-' + this._customTimes.fri_end,
+                    0: this._getTimeSlot(this._customTimes.mon_start, this._customTimes.mon_end),
+                    1: this._getTimeSlot(this._customTimes.tues_start, this._customTimes.tues_end),
+                    2: this._getTimeSlot(this._customTimes.wed_start, this._customTimes.wed_end),
+                    3: this._getTimeSlot(this._customTimes.thur_start, this._customTimes.thur_end),
+                    4: this._getTimeSlot(this._customTimes.fri_start, this._customTimes.fri_end),
                 };
 
                 this.dispatchEvent(new CustomEvent('save', { detail: eventData }));
 
                 this.set("_customTimes", {});
+            }
+
+            _getTimeSlot(start , end){
+                if(start === undefined || this._timeTest.test(start)){
+                    start = '';
+                }
+
+                if(end === undefined || this._timeTest.test(end)){
+                    end = '';
+                }
+
+                return start + ' - ' + end;
             }
 
         }
