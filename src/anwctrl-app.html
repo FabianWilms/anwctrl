@@ -18,6 +18,7 @@
 <link rel="import" href="anw-single.html">
 <link rel="import" href="anw-quickselect.html">
 <link rel="import" href="anw-customselect.html">
+<link rel="import" href="anw-customtime.html">
 <link rel="import" href="anw-notifications/anw-notifications.html">
 
 
@@ -147,7 +148,7 @@
 
                         <anw-customselect on-save="_updateStatus"></anw-customselect>
 
-
+                        <anw-customtime on-save="_updateTimes"></anw-customtime>
                     </template>
                 </template>
             </div>
@@ -179,6 +180,13 @@
                 const data = event.detail;
                 console.log(data);
                 this._changeState(data.status, data.message, data.emoji, data.until);
+            }
+
+            _updateTimes(event) {
+                const data = event.detail;
+                console.log(data);
+
+                this.set('selectedAnwesenheit.zeiten', data);
             }
 
             _changeState(newStatus, newMessage, newEmoji, newUntil) {

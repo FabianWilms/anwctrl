@@ -1,0 +1,125 @@
+<link rel="import"
+      href="../bower_components/polymer/polymer-element.html">
+<link rel="import"
+      href="../bower_components/paper-card/paper-card.html">
+<link rel="import"
+      href="../bower_components/paper-button/paper-button.html">
+<link rel="import"
+      href="../bower_components/paper-time-input/paper-time-input.html">
+<link rel="import"
+      href="../bower_components/app-layout/app-layout.html">
+
+<link rel="import"
+      href="https://raw.githubusercontent.com/FabianWilms/anwesenheit/master/styles/anw-style.html">
+
+<dom-module id="anw-customtime">
+    <template>
+        <style include="anw-style"></style>
+        <style include="iron-flex iron-flex-alignment"></style>
+        <style>
+            :host {
+                display: block;
+            }
+
+            .full-width {
+                width: 100%;
+            }
+
+            paper-card {
+                width: 100%;
+                background: white;
+                --paper-card-actions: {
+                    border-top: 1px solid #fafafa;
+                }
+            }
+
+            paper-button {
+                margin: 8px;
+            }
+
+        </style>
+
+        <paper-card>
+            <div class="card-content">
+                <div>Zeiten</div>
+                <div>
+                    Montag:
+                    <paper-time-input format="24" value="{{_customTimes.mon_start}}"></paper-time-input>
+                    bis
+                    <paper-time-input format="24" value="{{_customTimes.mon_end}}"></paper-time-input>
+                </div>
+                <br>
+                <div>
+                    Dienstag:
+                    <paper-time-input format="24" value="{{_customTimes.tues_start}}"></paper-time-input>
+                    bis
+                    <paper-time-input format="24" value="{{_customTimes.tues_end}}"></paper-time-input>
+                </div>
+                <br>
+                <div>
+                    Mittwoch:
+                    <paper-time-input format="24" value="{{_customTimes.wed_start}}"></paper-time-input>
+                    bis
+                    <paper-time-input format="24" value="{{_customTimes.wed_end}}"></paper-time-input>
+                </div>
+                <br>
+                <div>
+                    Donnerstag:
+                    <paper-time-input format="24" value="{{_customTimes.thur_start}}"></paper-time-input>
+                    bis
+                    <paper-time-input format="24" value="{{_customTimes.thur_end}}"></paper-time-input>
+                </div>
+                <br>
+                <div>
+                    Freitag:
+                    <paper-time-input format="24" value="{{_customTimes.fri_start}}"></paper-time-input>
+                    bis
+                    <paper-time-input format="24" value="{{_customTimes.fri_end}}"></paper-time-input>
+                </div>
+                <br>
+            </div>
+            <div class="card-actions">
+                <paper-button class="anw-state foreground"
+                              on-tap="_saveCustom">Speichern</paper-button>
+            </div>
+        </paper-card>
+
+
+    </template>
+
+    <script>
+
+        class AnwCustomTimesselect extends Polymer.Element {
+
+            static get is() {
+                return 'anw-customtime';
+            }
+
+            static get properties() {
+                return {
+                    _customTimes: {
+                        type: Object,
+                        value: {}
+                    }
+                };
+            }
+
+            _saveCustom() {
+                var eventData = {
+                    0: this._customTimes.mon_start + '-' + this._customTimes.mon_end,
+                    1: this._customTimes.tues_start + '-' + this._customTimes.tues_end,
+                    2: this._customTimes.wed_start + '-' + this._customTimes.wed_end,
+                    3: this._customTimes.thur_start + '-' + this._customTimes.thur_end,
+                    4: this._customTimes.fri_start + '-' + this._customTimes.fri_end,
+                };
+
+                this.dispatchEvent(new CustomEvent('save', { detail: eventData }));
+
+                this.set("_customTimes", {});
+            }
+
+        }
+
+        window.customElements.define(AnwCustomTimesselect.is, AnwCustomTimesselect);
+    </script>
+</dom-module>
