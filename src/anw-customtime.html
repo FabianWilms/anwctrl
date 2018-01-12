@@ -190,10 +190,6 @@
             }
 
             _getTimeSlot(start, end) {
-
-                console.log(start);
-                console.log(end);
-
                 if (start === undefined || !this._timeTest.test(start)) {
                     start = '';
                 }
@@ -206,6 +202,10 @@
             }
 
             _extractMagic(currentTimes, index, isStart, isHour){
+                if(currentTimes === undefined){
+                    return undefined;
+                }
+
                 let result = currentTimes[index];
 
                 if(isStart === 1){
@@ -214,8 +214,9 @@
                     result = this._extractEnd(result);
                 }
 
-                if(!this._timeTest.test(result))
+                if(!this._timeTest.test(result)) {
                     return undefined;
+                }
 
                 if(isHour === 1){
                     result = this._extractHour(result)
