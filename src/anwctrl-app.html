@@ -18,6 +18,7 @@
 <link rel="import" href="anw-single.html">
 <link rel="import" href="anw-quickselect.html">
 <link rel="import" href="anw-customselect.html">
+<link rel="import" href="anw-customtime.html">
 <link rel="import" href="anw-notifications/anw-notifications.html">
 
 
@@ -32,6 +33,7 @@
                 max-width: 460px;
                 width: 100%;
                 padding-top: 100px;
+                margin-bottom: 32px;
             }
 
             paper-tabs {
@@ -82,7 +84,11 @@
             }
 
             anw-customselect {
-                padding: 8px 8px 32px 8px;
+                padding: 8px 8px 8px 8px;
+            }
+
+            anw-customtime {
+                padding: 8px 8px 8px 8px;
             }
 
             iron-icon {
@@ -147,7 +153,7 @@
 
                         <anw-customselect on-save="_updateStatus"></anw-customselect>
 
-
+                        <anw-customtime current-times={{selectedAnwesenheit.zeiten}}></anw-customtime>
                     </template>
                 </template>
             </div>
