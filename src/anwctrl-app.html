@@ -33,6 +33,7 @@
                 max-width: 460px;
                 width: 100%;
                 padding-top: 100px;
+                margin-bottom: 32px;
             }
 
             paper-tabs {
@@ -83,11 +84,11 @@
             }
 
             anw-customselect {
-                padding: 8px 8px 32px 8px;
+                padding: 8px 8px 8px 8px;
             }
 
             anw-customtime {
-                padding: 8px 8px 32px 8px;
+                padding: 8px 8px 8px 8px;
             }
 
             iron-icon {
@@ -152,7 +153,7 @@
 
                         <anw-customselect on-save="_updateStatus"></anw-customselect>
 
-                        <anw-customtime on-save="_updateTimes"></anw-customtime>
+                        <anw-customtime current-times={{selectedAnwesenheit.zeiten}}></anw-customtime>
                     </template>
                 </template>
             </div>
@@ -186,13 +187,6 @@
                 this._changeState(data.status, data.message, data.emoji, data.until);
             }
 
-            _updateTimes(event) {
-                const data = event.detail;
-                console.log(data);
-
-                this.set('selectedAnwesenheit.zeiten', data);
-            }
-
             _changeState(newStatus, newMessage, newEmoji, newUntil) {
                 this.set('selectedAnwesenheit.status', newStatus);
                 this.set('selectedAnwesenheit.message', newMessage);
@@ -208,6 +202,11 @@
 
             _toggleDrawer(event) {
                 this.$.drawer.toggle();
+            }
+
+            _test(obj){
+                console.log(obj);
+                return obj;
             }
         }
 
