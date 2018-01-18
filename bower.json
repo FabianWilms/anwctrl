@@ -23,8 +23,7 @@
     "paper-radio-button": "PolymerElements/paper-radio-button#^2.0.0",
     "paper-tabs": "PolymerElements/paper-tabs#^2.0.0",
     "vaadin-material-theme": "vaadin/vaadin-material-theme#^0.3.0",
-    "paper-progress": "PolymerElements/paper-progress#^2.0.1",
-    "paper-time-input": "ryanburns23/paper-time-input#^2.0.4"
+    "paper-progress": "PolymerElements/paper-progress#^2.0.1"
   },
   "devDependencies": {
     "web-component-tester": "Polymer/web-component-tester#^6.0.0",

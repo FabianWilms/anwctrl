@@ -5,7 +5,7 @@
 <link rel="import"
       href="../bower_components/paper-button/paper-button.html">
 <link rel="import"
-      href="../bower_components/paper-time-input/paper-time-input.html">
+        href="../bower_components/paper-input/paper-input.html">
 <link rel="import"
       href="../bower_components/app-layout/app-layout.html">
 
@@ -49,18 +49,18 @@
                             <b>Montag</b>
                         </td>
                         <td>
-                            <paper-time-input label="Von" format="24"
-                                              value="{{_customTimes.mon_start}}"
-                                              hour="[[_extractMagic(currentTimes, 0, 1, 1)]]"
-                                              min="[[_extractMagic(currentTimes, 0, 1, 0)]]"
-                            ></paper-time-input>
+                            <paper-input 
+                                type="time"
+                                label="Von"
+                                value="{{currentTimes.montag.von}}">
+                            </paper-input>
                         </td>
                         <td>
-                            <paper-time-input label="Bis" format="24"
-                                              value="{{_customTimes.mon_end}}"
-                                              hour="[[_extractMagic(currentTimes, 0, 0, 1)]]"
-                                              min="[[_extractMagic(currentTimes, 0, 0, 0)]]"
-                            ></paper-time-input>
+                            <paper-input 
+                                type="time"
+                                label="Bis"
+                                value="{{currentTimes.montag.bis}}">
+                            </paper-input>
                         </td>
                     </tr>
                     <tr>
@@ -68,18 +68,18 @@
                             <b>Dienstag</b>
                         </td>
                         <td>
-                            <paper-time-input label="Von" format="24"
-                                              value="{{_customTimes.tues_start}}"
-                                              hour="[[_extractMagic(currentTimes, 1, 1, 1)]]"
-                                              min="[[_extractMagic(currentTimes, 1, 1, 0)]]"
-                            ></paper-time-input>
+                            <paper-input 
+                                type="time"
+                                label="Von"
+                                value="{{currentTimes.dienstag.von}}">
+                            </paper-input>
                         </td>
                         <td>
-                            <paper-time-input label="Bis" format="24"
-                                              value="{{_customTimes.tues_end}}"
-                                              hour="[[_extractMagic(currentTimes, 1, 0, 1)]]"
-                                              min="[[_extractMagic(currentTimes, 1, 0, 0)]]"
-                            ></paper-time-input>
+                            <paper-input 
+                                type="time"
+                                label="Bis"
+                                value="{{currentTimes.dienstag.bis}}">
+                            </paper-input>
                         </td>
                     </tr>
                     <tr>
@@ -87,18 +87,18 @@
                             <b>Mittwoch</b>
                         </td>
                         <td>
-                            <paper-time-input label="Von" format="24"
-                                              value="{{_customTimes.wed_start}}"
-                                              hour="[[_extractMagic(currentTimes, 2, 1, 1)]]"
-                                              min="[[_extractMagic(currentTimes, 2, 1, 0)]]"
-                            ></paper-time-input>
+                            <paper-input 
+                                type="time"
+                                label="Von"
+                                value="{{currentTimes.mittwoch.von}}">
+                            </paper-input>
                         </td>
                         <td>
-                            <paper-time-input label="Bis" format="24"
-                                              value="{{_customTimes.wed_end}}"
-                                              hour="[[_extractMagic(currentTimes, 2, 0, 1)]]"
-                                              min="[[_extractMagic(currentTimes, 2, 0, 0)]]"
-                            ></paper-time-input>
+                            <paper-input 
+                                type="time"
+                                label="Bis"
+                                value="{{currentTimes.mittwoch.bis}}">
+                            </paper-input>
                         </td>
                     </tr>
                     <tr>
@@ -106,18 +106,18 @@
                             <b>Donnerstag</b>
                         </td>
                         <td>
-                            <paper-time-input label="Von" format="24"
-                                              value="{{_customTimes.thur_start}}"
-                                              hour="[[_extractMagic(currentTimes, 3, 1, 1)]]"
-                                              min="[[_extractMagic(currentTimes, 3, 1, 0)]]"
-                            ></paper-time-input>
+                            <paper-input 
+                                type="time"
+                                label="Von"
+                                value="{{currentTimes.donnerstag.von}}">
+                            </paper-input>
                         </td>
                         <td>
-                            <paper-time-input label="Bis" format="24"
-                                              value="{{_customTimes.thur_end}}"
-                                              hour="[[_extractMagic(currentTimes, 3, 0, 1)]]"
-                                              min="[[_extractMagic(currentTimes, 3, 0, 0)]]"
-                            ></paper-time-input>
+                            <paper-input 
+                                type="time"
+                                label="Bis"
+                                value="{{currentTimes.donnerstag.bis}}">
+                            </paper-input>
                         </td>
                     </tr>
                     <tr>
@@ -125,28 +125,23 @@
                             <b>Freitag</b>
                         </td>
                         <td>
-                            <paper-time-input label="Von" format="24"
-                                              value="{{_customTimes.fri_start}}"
-                                              hour="[[_extractMagic(currentTimes, 4, 1, 1)]]"
-                                              min="[[_extractMagic(currentTimes, 4, 1, 0)]]"
-                            ></paper-time-input>
+                            <paper-input 
+                                type="time"
+                                label="Von"
+                                value="{{currentTimes.freitag.von}}">
+                            </paper-input>
                         </td>
                         <td>
-                            <paper-time-input label="Bis" format="24"
-                                              value="{{_customTimes.fri_end}}"
-                                              hour="[[_extractMagic(currentTimes, 4, 0, 1)]]"
-                                              min="[[_extractMagic(currentTimes, 4, 0, 0)]]"
-                            ></paper-time-input>
+                            <paper-input 
+                                type="time"
+                                label="Bis"
+                                value="{{currentTimes.freitag.bis}}">
+                            </paper-input>
                         </td>
                     </tr>
                     </tbody>
                 </table>
                 <br>
-            </div>
-            <div class="card-actions">
-                <paper-button class="anw-state foreground"
-                              on-tap="_saveCustom">Speichern
-                </paper-button>
             </div>
         </paper-card>
 
@@ -164,80 +159,11 @@
             static get properties() {
                 return {
                     currentTimes: {
-                        type: Object
-                    },
-                    _customTimes: {
                         type: Object,
-                        value: {}
-                    },
-                    _timeTest: {
-                        type: RegExp,
-                        value: RegExp(/\s*([0-1][0-9]|2[0-4]):[0-5][0-9]\s*/)
+                        notify: true
                     }
                 };
             }
-
-            _saveCustom() {
-                this.set('currentTimes.0', this._getTimeSlot(this._customTimes.mon_start, this._customTimes.mon_end));
-                this.set('currentTimes.1', this._getTimeSlot(this._customTimes.tues_start, this._customTimes.tues_end));
-                this.set('currentTimes.2', this._getTimeSlot(this._customTimes.wed_start, this._customTimes.wed_end));
-                this.set('currentTimes.3', this._getTimeSlot(this._customTimes.thur_start, this._customTimes.thur_end));
-                this.set('currentTimes.4', this._getTimeSlot(this._customTimes.fri_start, this._customTimes.fri_end));
-            }
-
-            _getTimeSlot(start, end) {
-                if (start === undefined || !this._timeTest.test(start)) {
-                    start = '';
-                }
-
-                if (end === undefined || !this._timeTest.test(end)) {
-                    end = '';
-                }
-
-                return (start + '- ' + end).trim();
-            }
-
-            _extractMagic(currentTimes, index, isStart, isHour){
-                if(currentTimes === undefined){
-                    return undefined;
-                }
-
-                let result = currentTimes[index];
-
-                if(isStart === 1){
-                    result = this._extractStart(result);
-                } else {
-                    result = this._extractEnd(result);
-                }
-
-                if(!this._timeTest.test(result)) {
-                    return undefined;
-                }
-
-                if(isHour === 1){
-                    result = this._extractHour(result)
-                } else {
-                    result = this._extractMin(result)
-                }
-                return result;
-            }
-
-            _extractHour(time){
-                return time.replace(/:[0-5][0-9]/, '');
-            }
-
-            _extractMin(time){
-                return time.replace(/([0-1][0-9]|2[0-4]):/, '');
-            }
-
-            _extractStart(timeSlot) {
-                return timeSlot.replace(/\s*-.*/, '').trim();
-            }
-
-            _extractEnd(timeSlot) {
-                return timeSlot.replace(/([0-1][0-9]|2[0-4]):[0-5][0-9]\s*-\s*/, '').trim();
-            }
-
         }
 
         window.customElements.define(AnwCustomTimesselect.is, AnwCustomTimesselect);
