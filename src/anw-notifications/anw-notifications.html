@@ -1,10 +1,7 @@
 <link rel="import" href="../../node_modules/@bower_components/polymer/polymer-element.html">
-<link rel="import" href="../../node_modules/@bower_components/paper-icon-button/paper-icon-button.html">
-<link rel="import" href="../../node_modules/@bower_components/paper-item/paper-icon-item.html">
-<link rel="import" href="../../node_modules/@bower_components/paper-item/paper-item-body.html">
-<link rel="import" href="../../node_modules/@bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../../node_modules/@bower_components/iron-flex-layout/iron-flex-layout-classes.html">
-<script src="./moment-with-locales.js"></script>
+
+<link rel="import" href="anw-notification-item.html">
 
 <dom-module id="anw-notifications">
     <template>
@@ -26,14 +23,7 @@
 
 
         <template is="dom-repeat" items="[[notifies]]">
-            <paper-icon-item>
-                <paper-icon-button icon="clear" title="Löschen" slot="item-icon" on-tap="_delete" data-item$="{{item}}">
-                </paper-icon-button>
-                <paper-item-body two-line>
-                    <div>{{item.name}}</div>
-                    <div secondary>{{_toString(item.date)}}</div>
-                </paper-item-body>
-            </paper-icon-item>
+            <anw-notification-item data="{{item}}"></anw-notification-item>
         </template>
 
         <template is="dom-if" if="[[!notifies.length]]">
@@ -69,11 +59,6 @@
             ready() {
                 super.ready();
                 navigator.serviceWorker.register('service-worker.js');
-            }
-
-            _delete(event) {
-                const item = JSON.parse(event.target.dataset.item);
-                this.dispatchEvent(new CustomEvent('delete', { detail: item.$key }));
             }
 
             _sendNotification(newNData) {
