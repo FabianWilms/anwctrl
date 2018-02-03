@@ -1,0 +1,90 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item-body.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+
+<script src="./moment-with-locales.js"></script>
+<dom-module id="anw-notification-item">
+    <template>
+        <style include="iron-flex iron-flex-alignment"></style>
+        <style>
+            :host {
+                text-align: left;
+            }
+
+            paper-card {
+                    margin: 8px;
+                    padding: 8px;
+                    width: 95%;
+            }
+
+            .secondary {
+                color: var(--light-primary-color);
+            }
+
+            .content {
+                padding-top: 8px;
+                max-height: 400px;
+                overflow: auto;
+            }
+        </style>
+
+        <paper-card>
+            <div class="layout horizontal center secondary">
+                <span class="flex">{{_toString(data.date)}}</span>
+                <paper-icon-button icon="info" title="Informationen"></paper-icon-button>
+                <paper-icon-button icon="clear" title="Löschen" slot="item-icon" on-tap="_delete" data-item$="{{data}}"></paper-icon-button>
+            </div>
+            <div class="content">{{data.name}}</div>
+        </paper-card>
+
+
+    </template>
+
+    <script>
+        /**
+         * `AnwNotificationItem
+        ` Description
+         *
+         * @summary ShortDescription.
+         * @customElement
+         * @polymer
+         * @extends {Polymer.Element}
+         */
+        class AnwNotificationItem extends Polymer.Element {
+            /**
+             * String providing the tag name to register the element under.
+             */
+            static get is() {
+                return 'anw-notification-item';
+            }
+
+            /**
+             * Object describing property-related metadata used by Polymer features
+             */
+            static get properties() {
+                return {
+
+                };
+            }
+
+            _delete(event) {
+                const item = JSON.parse(event.target.dataset.item);
+                this.dispatchEvent(new CustomEvent('delete', {
+                    bubbles: true,
+                    composed: true,
+                    detail: item.$key
+                }));
+            }
+
+            _toString(dateString) {
+                return AnwNotifications._toDateString(dateString);
+            }
+
+        }
+
+        window.customElements.define(AnwNotificationItem.is, AnwNotificationItem);
+    </script>
+</dom-module>
