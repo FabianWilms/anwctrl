@@ -9,6 +9,12 @@
     <template>
         <style include="iron-flex iron-flex-alignment"></style>
         <style>
+
+            :host {
+                height: 100%;
+                overflow: auto;
+            }
+
             .wrapper {
                 height: 100%;
             }
@@ -29,7 +35,7 @@
         </template>
 
         <template is="dom-if" if="[[!notifies.length]]">
-            <div class="layout vertical center-justified wrapper">
+            <div class="layout vertical center-justified">
                 <span class="emoji">🙁</span>
                 <h1>Keiner will dich sehen</h1>
             </div>

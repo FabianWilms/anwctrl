@@ -1,9 +1,9 @@
-<link rel="import" href="../../node_modules/@bower_components/polymer/polymer-element.html">
-<link rel="import" href="../../node_modules/@bower_components/iron-icons/iron-icons.html">
-<link rel="import" href="../../node_modules/@bower_components/paper-icon-button/paper-icon-button.html">
-<link rel="import" href="../../node_modules/@bower_components/paper-card/paper-card.html">
-<link rel="import" href="../../node_modules/@bower_components/paper-item/paper-item-body.html">
-<link rel="import" href="../../node_modules/@bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item-body.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 
 <script src="./moment-with-locales.js"></script>
 <dom-module id="anw-notification-item">
@@ -11,30 +11,34 @@
         <style include="iron-flex iron-flex-alignment"></style>
         <style>
             :host {
-                display: block;
                 text-align: left;
             }
 
             paper-card {
-                margin: 8px;
-                padding: 8px;
-                margin-right: 32px;
-                width: 90%;
+                    margin: 8px;
+                    padding: 8px;
+                    width: 95%;
             }
 
             .secondary {
                 color: var(--light-primary-color);
             }
+
+            .content {
+                padding-top: 8px;
+                max-height: 400px;
+                overflow: auto;
+            }
         </style>
 
         <paper-card>
-            <div class="layout horizontal secondary">
-                <div class="flex">{{_toString(data.date)}}</div>
+            <div class="layout horizontal center secondary">
+                <span class="flex">{{_toString(data.date)}}</span>
                 <paper-icon-button icon="info" title="Informationen"></paper-icon-button>
                 <paper-icon-button icon="clear" title="Löschen" slot="item-icon" on-tap="_delete" data-item$="{{data}}"></paper-icon-button>
             </div>
-            <div class="wrap">{{data.name}}</div>
-            </paper-card>
+            <div class="content">{{data.name}}</div>
+        </paper-card>
 
 
     </template>
