@@ -3,10 +3,13 @@ language: node_js
 node_js:
   - "node"
 
+cache:
+  yarn: true
+  directories:
+    - node_modules
+
 before_script:
-  - npm install -g bower
-  - npm install -g polymer-cli
-  - bower i
+  - yarn global add polymer-cli
 
 script: polymer build
 
