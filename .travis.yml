@@ -4,8 +4,7 @@ node_js:
   - "node"
 
 before_script:
-  - npm install -g yarn
-  - npm install -g polymer-cli
+  - yarn global add polymer-cli
   - yarn
 
 script: polymer build
