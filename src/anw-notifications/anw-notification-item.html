@@ -4,6 +4,7 @@
 <link rel="import" href="../../bower_components/paper-card/paper-card.html">
 <link rel="import" href="../../bower_components/paper-item/paper-item-body.html">
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../bower_components/iron-collapse/iron-collapse.html">
 
 <script src="./moment-with-locales.js"></script>
 <dom-module id="anw-notification-item">
@@ -22,7 +23,7 @@
             }
 
             .secondary {
-                color: var(--light-primary-color);
+                font-weight: bold;
             }
 
             .content {
@@ -31,14 +32,35 @@
                 white-space: normal;
                 overflow: auto;
             }
+
+            .info {
+                font-family: monospace;
+                font-size: 14px;
+                background: lightgray;
+                padding: 2px 8px;
+            }
+
+            .info span {
+                padding-left: 4px;
+            }
         </style>
 
         <paper-card>
             <div class="layout horizontal center secondary">
                 <span class="flex">{{_toString(data.date)}}</span>
-                <paper-icon-button icon="info" title="Informationen"></paper-icon-button>
+                <paper-icon-button icon="info" title="Informationen" on-tap="_toggleCollapse"></paper-icon-button>
                 <paper-icon-button icon="clear" title="Löschen" slot="item-icon" on-tap="_delete" data-item$="{{data}}"></paper-icon-button>
             </div>
+            <iron-collapse>
+                <div class="info">
+                    <b>Author</b><br>
+                    <span>{{data.details.author}}</span><br>
+                    <b>Platform</b><br>
+                    <span>{{data.details.platform}}</span><br>
+                    <b>Agent</b><br>
+                    <span>{{data.details.agent}}</span><br>
+                </div>
+            </iron-collapse>
             <div class="content">{{data.message}}</div>
         </paper-card>
 
@@ -70,6 +92,10 @@
                 return {
 
                 };
+            }
+
+            _toggleCollapse(event) {
+                this.shadowRoot.querySelector('iron-collapse').toggle();
             }
 
             _delete(event) {
