@@ -94,7 +94,17 @@
                         if (result === 'granted') {
                             navigator.serviceWorker.ready.then(function (registration) {
                                 for (var key in newNotifications) {
-                                    registration.showNotification(newNotifications[key].name + ' möchte dich treffen!',
+                                    
+                                    let author = newNotifications[key].detail ? newNotifications[key].detail.author : undefined;
+                                    
+                                    let message = "";
+                                    if (author) {
+                                        message = `Neue Nachricht von ${author}.`;
+                                    } else {
+                                        message = "Neue Nachricht erhalten."
+                                    }
+
+                                    registration.showNotification(message,
                                         {
                                             icon: "https://fabianwilms.github.io/anwctrl/images/touch/android-icon-192x192.png",
                                             body: AnwNotifications._toDateString(newNotifications[key].date),
