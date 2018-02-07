@@ -11,13 +11,14 @@
         <style include="iron-flex iron-flex-alignment"></style>
         <style>
             :host {
+                display: block;
                 text-align: left;
             }
 
             paper-card {
-                    margin: 8px;
-                    padding: 8px;
-                    width: 95%;
+                margin: 8px;
+                padding: 8px;
+                width: 95%;
             }
 
             .secondary {
@@ -25,8 +26,9 @@
             }
 
             .content {
+                max-height: 300px;
                 padding-top: 8px;
-                max-height: 400px;
+                white-space: normal;
                 overflow: auto;
             }
         </style>
