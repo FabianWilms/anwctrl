@@ -92,25 +92,34 @@
 
                     Notification.requestPermission(function (result) {
                         if (result === 'granted') {
+
+                            // Zum speichern, ob eine Benachrichtigung bereits angezeigt wurde
+                            let notifiedStorage = window.localStorage;
+
                             navigator.serviceWorker.ready.then(function (registration) {
                                 for (var key in newNotifications) {
-                                    
-                                    let author = newNotifications[key].detail ? newNotifications[key].detail.author : undefined;
-                                    
-                                    let message = "";
-                                    if (author) {
-                                        message = `Neue Nachricht von ${author}.`;
-                                    } else {
-                                        message = "Neue Nachricht erhalten."
-                                    }
 
-                                    registration.showNotification(message,
-                                        {
-                                            icon: "https://fabianwilms.github.io/anwctrl/images/touch/android-icon-192x192.png",
-                                            body: AnwNotifications._toDateString(newNotifications[key].date),
-                                            badge: "https://fabianwilms.github.io/anwctrl/images/touch/notification.png",
-                                            vibrate: [300, 100, 300]
-                                        });
+                                    // Wenn Benachrichtigung noch nicht bereits angezeigt wurde...
+                                    if(!notifiedStorage.getItem(key)) {
+                                        let author = newNotifications[key].detail ? newNotifications[key].details.author : undefined;
+                                        
+                                        let message = "";
+                                        if (author) {
+                                            message = `Neue Nachricht von ${author}.`;
+                                        } else {
+                                            message = "Neue Nachricht erhalten."
+                                        }
+
+                                        registration.showNotification(message,
+                                            {
+                                                icon: "https://fabianwilms.github.io/anwctrl/images/touch/android-icon-192x192.png",
+                                                body: AnwNotifications._toDateString(newNotifications[key].date),
+                                                badge: "https://fabianwilms.github.io/anwctrl/images/touch/notification.png",
+                                                vibrate: [300, 100, 300]
+                                            });
+                                        // Als "Benachrichtigt" markiert
+                                        notifiedStorage.setItem(key, newNotifications[key])
+                                    }
                                 }
                             });
                         }

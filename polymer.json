@@ -7,7 +7,7 @@
   "sources": [
     "src/**/*",
     "images/**/*",
-    "package.json"
+    "bower.json"
    ],
   "lint": {
     "rules": [
