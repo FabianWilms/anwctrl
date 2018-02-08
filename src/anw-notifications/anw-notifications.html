@@ -101,11 +101,11 @@
 
                                     // Wenn Benachrichtigung noch nicht bereits angezeigt wurde...
                                     if(!notifiedStorage.getItem(key)) {
-                                        let author = newNotifications[key].detail ? newNotifications[key].details.author : undefined;
-                                        
-                                        let message = "";
+                                        var author = newNotifications[key].details ? newNotifications[key].details.author : undefined;
+                                        var message = "";
+
                                         if (author) {
-                                            message = `Neue Nachricht von ${author}.`;
+                                            message = `Neue Nachricht von "${author}".`;
                                         } else {
                                             message = "Neue Nachricht erhalten."
                                         }
@@ -134,6 +134,7 @@
                 var retObj = {};
                 for (var i in arrayObject) {
                     retObj[arrayObject[i].$key] = {
+                        details: arrayObject[i].details,
                         name: arrayObject[i].name,
                         date: arrayObject[i].date
                     }
