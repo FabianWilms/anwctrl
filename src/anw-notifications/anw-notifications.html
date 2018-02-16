@@ -17,6 +17,7 @@
 
             .wrapper {
                 height: 100%;
+                padding: 0px 16px;
             }
 
             h1 {
@@ -33,11 +34,13 @@
             }
         </style>
 
-        <div class="bottom-pad">
-            <template is="dom-repeat" items="[[notifies]]" sort="_byTime">
-                <anw-notification-item data="{{item}}"></anw-notification-item>
-            </template>
-        </div>
+        <template is="dom-if" if="[[notifies.length]]">
+            <div class="bottom-pad">
+                <template is="dom-repeat" items="[[notifies]]" sort="_byTime">
+                    <anw-notification-item data="{{item}}"></anw-notification-item>
+                </template>
+            </div>
+        </template>
 
         <template is="dom-if" if="[[!notifies.length]]">
             <div class="layout vertical center-justified wrapper">
@@ -101,7 +104,7 @@
                                 for (var key in newNotifications) {
 
                                     // Wenn Benachrichtigung noch nicht bereits angezeigt wurde...
-                                    if(!notifiedStorage.getItem(key)) {
+                                    if (!notifiedStorage.getItem(key)) {
                                         var author = newNotifications[key].details ? newNotifications[key].details.author : undefined;
                                         var message = "";
 
