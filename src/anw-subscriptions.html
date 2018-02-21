@@ -1,0 +1,75 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/iron-icons/social-icons.html">
+<link rel="import" href="../bower_components/paper-menu-button/paper-menu-button.html">
+<link rel="import" href="../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../bower_components/paper-item/paper-item.html">
+
+
+<dom-module id="anw-subscriptions">
+    <template>
+        <style>
+            :host {
+                display: block
+            }
+        </style>
+
+        <paper-menu-button horizontal-align="right" vertical-offset="60">
+            <paper-icon-button slot="dropdown-trigger" title="Subscriptions" icon="{{_getIcon(subscriptions)}}"></paper-icon-button>
+            <paper-listbox slot="dropdown-content">
+                <template is="dom-repeat" items="{{_asArray(subscriptions)}}">
+                    <paper-item>[[item]]</paper-item>
+                </template>
+            </paper-listbox>
+        </paper-menu-button>
+
+    </template>
+
+    <script>
+        /**
+         * `anw-subscriptions` Description
+         *
+         * @summary ShortDescription.
+         * @customElement
+         * @polymer
+         * @extends {Polymer.Element}
+         */
+        class AnwSubscriptions extends Polymer.Element {
+            /**
+             * String providing the tag name to register the element under.
+             */
+            static get is() {
+                return 'anw-subscriptions';
+            }
+
+            /**
+             * Object describing property-related metadata used by Polymer features
+             */
+            static get properties() {
+                return {
+                    subscriptions: Object,
+                };
+            }
+
+            _getIcon(subs) {
+                return subs ? "social:notifications-active" : "social:notifications-none";
+            }
+
+            _asArray(subs) {
+                if(subs) {
+                    var arr = [];
+                    for (var key in subs) {
+                        arr.push(subs[key]);
+                    }
+                    return arr;
+                } else {
+                    return [];
+                }
+            }
+
+        }
+
+        window.customElements.define(AnwSubscriptions.is, AnwSubscriptions);
+    </script>
+</dom-module>

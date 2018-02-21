@@ -24,7 +24,9 @@
     "paper-tabs": "PolymerElements/paper-tabs#^2.0.0",
     "vaadin-material-theme": "vaadin/vaadin-material-theme#^0.3.0",
     "paper-progress": "PolymerElements/paper-progress#^2.0.1",
-    "iron-collapse": "PolymerElements/iron-collapse#^2.1.0"
+    "iron-collapse": "PolymerElements/iron-collapse#^2.1.0",
+    "paper-menu-button": "PolymerElements/paper-menu-button#^2.1.0",
+    "paper-listbox": "PolymerElements/paper-listbox#^2.0.0"
   },
   "devDependencies": {
     "web-component-tester": "Polymer/web-component-tester#^6.0.0",
