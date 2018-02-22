@@ -48,7 +48,10 @@
              */
             static get properties() {
                 return {
-                    subscriptions: Object,
+                    subscriptions: {
+                        type: Object,
+                        value: {}
+                    }
                 };
             }
 
