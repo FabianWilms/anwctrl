@@ -2,7 +2,7 @@
   "name": "ANW CTRL",
   "short_name": "ANW-CTRL",
   "description": "Anwesenheit des Büros kontrollieren",
-  "start_url": "/",
+  "start_url": "index.html",
   "display": "standalone",
   "icons": [
   {
