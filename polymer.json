@@ -6,6 +6,7 @@
     }
   ],
   "sources": [
+    "manifest.json",
     "src/**/*",
     "images/**/*",
     "bower.json"
