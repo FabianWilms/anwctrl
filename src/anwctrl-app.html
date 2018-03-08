@@ -1,6 +1,5 @@
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
 <link rel="import" href="../bower_components/paper-styles/default-theme.html">
-<link rel="import" href="../bower_components/paper-badge/paper-badge.html">
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
@@ -22,6 +21,7 @@
 <link rel="import" href="anw-customtime.html">
 <link rel="import" href="anw-notifications/anw-notifications.html">
 <link rel="import" href="anw-subscriptions.html">
+<link rel="import" href="anwctrl-icons.html">
 
 
 <dom-module id="anwctrl-app">
@@ -45,15 +45,6 @@
                     background-color: #448aff;
                     color: #fff;
                 }
-            }
-
-            paper-badge {
-                --paper-badge-background: rgba(0, 0, 0, 0);
-                --paper-badge-text-color: #fff;
-            }
-
-            paper-badge[aria-label="0"] {
-                visibility: hidden;
             }
 
             app-toolbar {
@@ -120,8 +111,7 @@
                 <template is="dom-if" if="{{selectedUser}}">
                     <anw-subscriptions subscriptions="[[selectedAnwesenheit.subscriptions]]"></anw-subscriptions>
                 </template>
-                <paper-icon-button id="btn" icon="inbox" on-tap="_toggleDrawer"></paper-icon-button>
-                <paper-badge for="btn" label="[[notifies.length]]"></paper-badge>
+                <paper-icon-button id="btn" icon="{{_getIcon(notifies.length)}}" on-tap="_toggleDrawer"></paper-icon-button>
             </app-toolbar>
 
             <paper-tabs attr-for-selected="value" selected="{{selectedUser}}" selected="0" scrollable>
@@ -204,6 +194,15 @@
 
             _toggleDrawer(event) {
                 this.$.drawer.toggle();
+            }
+
+            _getIcon(size) {
+                console.log(size);
+                if(size >= 0 && size <= 9) {
+                    return `anwctrl:number-${size}`;
+                } else {
+                    return "anwctrl:number-more";
+                }
             }
         }
 
