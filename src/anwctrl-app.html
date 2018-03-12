@@ -32,7 +32,6 @@
             }
 
             .main-content {
-                max-width: 460px;
                 width: 100%;
                 padding-top: 100px;
                 margin-bottom: 32px;
@@ -72,17 +71,13 @@
                 --paper-progress-active-color: #448aff;
                 --paper-progress-container-color: #4fcfff;
             }
-
-            anw-single {
-                padding: 32px 8px 8px 8px;
+            
+            div.settings {
+                padding: 32px 32px;
             }
 
-            anw-customselect {
-                padding: 8px 8px 8px 8px;
-            }
-
-            anw-customtime {
-                padding: 8px 8px 8px 8px;
+            .setting {
+                padding: 8px;
             }
 
             iron-icon {
@@ -131,7 +126,7 @@
             <anw-notifications on-delete="_delete" notifies={{notifies}}></anw-notificiations>
         </app-drawer>
 
-        <div class="layout horizontal center-justified">
+        <div class="layout horizontal">
             <div class="layout vertical main-content">
 
                 <auth-element user={{user}}></auth-element>
@@ -139,13 +134,15 @@
                 <template is="dom-if" if="{{user}}">
                     <template is="dom-if" if="{{selectedUser}}">
 
-                        <anw-single person={{selectedAnwesenheit}}></anw-single>
+                        <div class="settings layout horizontal wrap center-justified">
+                            <div class="setting">
+                                <anw-single person={{selectedAnwesenheit}}></anw-single>
+                                <anw-quickselect on-klick="_updateStatus"></anw-quickselect>
+                            </div>
+                            <anw-customselect class="setting" on-save="_updateStatus"></anw-customselect>
+                            <anw-customtime class="setting" current-times="{{selectedAnwesenheit.sprechzeiten}}"></anw-customtime>
+                        </div>
 
-                        <anw-quickselect on-klick="_updateStatus"></anw-quickselect>
-
-                        <anw-customselect on-save="_updateStatus"></anw-customselect>
-
-                        <anw-customtime current-times="{{selectedAnwesenheit.sprechzeiten}}"></anw-customtime>
                     </template>
                 </template>
             </div>
@@ -198,7 +195,7 @@
 
             _getIcon(size) {
                 console.log(size);
-                if(size >= 0 && size <= 9) {
+                if (size >= 0 && size <= 9) {
                     return `anwctrl:number-${size}`;
                 } else {
                     return "anwctrl:number-more";
