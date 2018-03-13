@@ -1,18 +1,20 @@
-<link rel="import"
-      href="../bower_components/polymer/polymer-element.html">
-<link rel="import"
-      href="../bower_components/paper-card/paper-card.html">
-<link rel="import"
-      href="../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 
-<link rel="import"
-      href="https://raw.githubusercontent.com/FabianWilms/anwesenheit/master/styles/anw-style.html">
+<link rel="import" href="https://raw.githubusercontent.com/FabianWilms/anwesenheit/master/styles/anw-style.html">
 
 <dom-module id="anw-single">
   <template>
     <style include="anw-style"></style>
     <style include="iron-flex iron-flex-alignment"></style>
     <style>
+      :host {
+        display: block;
+        max-width: var(--max-width);
+        width: 100%;
+      }
+
       paper-card {
         width: 100%;
       }
@@ -37,12 +39,10 @@
       }
     </style>
 
-    <paper-card class="anw-state background"
-                state$="[[person.status]]">
+    <paper-card class="anw-state background" state$="[[person.status]]">
       <div class="layout horizontal center card-header">
         <span class="flex">[[person.name]]</span>
-        <img src="[[person.avatar]]"
-             class="img-circle"></img>
+        <img src="[[person.avatar]]" class="img-circle"></img>
       </div>
 
       <div class="card-content">

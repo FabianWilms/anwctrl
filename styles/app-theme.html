@@ -37,11 +37,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     --accent-color: var(--paper-grey-300);
     --light-accent-color: var(--paper-grey-a100);
     --dark-accent-color: var(--paper-grey-a400);
+
+    --max-width: 400px;
     /* Components */
   }
 
   /* General styles */
-
+  body {
+    @apply(--layout-fullbleed);
+    @apply(--layout-vertical);
+    background-color: var(--primary-background-color);
+  }
 
   app-toolbar {
     color: var(--primary-text-color);
