@@ -12,6 +12,7 @@
   <style is="custom-style" include="shared-styles"></style>
 
   <script src="/bower_components/webcomponentsjs/webcomponents-lite.js"></script>
+  <script src="https://browser.sentry-cdn.com/4.0.4/bundle.min.js" crossorigin="anonymous"></script>
 
   <link rel="import" href="/src/anwctrl-app.html">
 
@@ -37,6 +38,10 @@
 
   <!-- Tile icon for Win8 (144x144) -->
   <meta name="msapplication-TileImage" content="images/touch/ms-icon-144x144-precomposed.png">
+
+  <script>
+    Sentry.init({ dsn: 'https://2d0c660399524b4d9a48294f36e33334@sentry.io/1287731' });
+  </script>
 </head>
 
 <body>
