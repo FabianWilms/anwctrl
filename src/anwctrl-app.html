@@ -173,14 +173,15 @@
             _updateStatus(event) {
                 const data = event.detail;
                 console.log(data);
-                this._changeState(data.status, data.message, data.emoji, data.until);
+                this._changeState(data.status, data.message, data.emoji, data.until, data.location);
             }
 
-            _changeState(newStatus, newMessage, newEmoji, newUntil) {
+            _changeState(newStatus, newMessage, newEmoji, newUntil, newLocation) {
                 this.set('selectedAnwesenheit.status', newStatus);
                 this.set('selectedAnwesenheit.message', newMessage);
                 this.set('selectedAnwesenheit.emoji', newEmoji);
                 this.set('selectedAnwesenheit.until', newUntil);
+                this.set('selectedAnwesenheit.location', newLocation);
             }
 
             _asArray(obj) {

@@ -70,6 +70,11 @@
                                  always-float-label>
                     </paper-input>
                 </div>
+                <paper-input value={{_customState.location}}
+                             class="flex"
+                             id="inputLocation"
+                             label="Location"
+                             always-float-label></paper-input>
                 <div>Status</div>
                 <paper-radio-group class="layout vertical"
                                    selected="{{_customState.status}}">
@@ -149,7 +154,8 @@
                     message: this._customState.message,
                     emoji: this._customState.emoji,
                     status: parseInt(this._customState.status),
-                    until: this._customState.until
+                    until: this._customState.until,
+                    location: this._customState.location
                 };
 
                 this.dispatchEvent(new CustomEvent('save', { detail: eventData }));
