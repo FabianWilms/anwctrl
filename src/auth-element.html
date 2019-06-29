@@ -61,7 +61,7 @@
         </template>
 
         <template is="dom-if"
-                  if="{{!user.displayName}}">
+                  if="{{_checkUser()}}">
             <div class="layout horizontal center-justified">
                 <div class="layout vertical center-justified">
                     <h1>Bitte gebe deinen Namen ein</h1>
@@ -98,6 +98,10 @@
                         type: String
                     }
                 };
+            }
+
+            _checkUser() {
+                return this.user !== undefined && this.user.displayName === null;
             }
 
             _saveUsername() {
