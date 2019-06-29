@@ -93,32 +93,25 @@
         </firebase-app>
 
         <firebase-document path="anwesenheiten" data="{{gesamtAnwesenheiten}}"></firebase-document>
-        <firebase-document path="anwesenheiten/[[selectedUser]]" data="{{selectedAnwesenheit}}"></firebase-document>
+        <firebase-document path="anwesenheiten/[[user.displayName]]" data="{{selectedAnwesenheit}}"></firebase-document>
         <firebase-document path="notify/[[selectedUser]]" data="{{secondifies}}"></firebase-document>
 
         <firebase-query path="notify/[[selectedUser]]" data="{{notifies}}"></firebase-query>
 
-        <app-localstorage-document key="selectedUser" data="{{selectedUser}}"></app-localstorage-document>
-
         <app-header reveals>
             <app-toolbar>
-                <div main-title>Anwesenheits Controller</div>
-                <template is="dom-if" if="{{selectedUser}}">
+                <template is="dom-if" if="{{user.displayName}}">
+                    <div main-title>Hallo {{selectedAnwesenheit.name}}</div>
+                </template>
+                <template is="dom-if" if="{{!user.displayName}}">
+                    <div main-title>Anwesenheits Controller</div>
+                </template>
                     <anw-subscriptions subscriptions="[[selectedAnwesenheit.subscriptions]]"></anw-subscriptions>
-                </template>
                 <paper-icon-button id="btn" icon="{{_getIcon(notifies.length)}}" on-tap="_toggleDrawer"></paper-icon-button>
+
+                <paper-progress hidden="{{gesamtAnwesenheiten.sebastian}}" indeterminate="{{!gesamtAnwesenheiten.sebastian}}" bottom-item>
+                </paper-progress>
             </app-toolbar>
-
-            <paper-tabs attr-for-selected="value" selected="{{selectedUser}}" selected="0" scrollable>
-                <template is="dom-if" if="{{user}}">
-                    <template is="dom-repeat" items="[[_asArray(gesamtAnwesenheiten)]]">
-                        <paper-tab value$="{{item.key}}">{{item.value.name}}</paper-tab>
-                    </template>
-                </template>
-            </paper-tabs>
-
-            <paper-progress hidden="{{gesamtAnwesenheiten.sebastian}}" indeterminate="{{!gesamtAnwesenheiten.sebastian}}" bottom-item>
-            </paper-progress>
 
         </app-header>
 
@@ -131,7 +124,7 @@
 
                 <auth-element user={{user}}></auth-element>
 
-                <template is="dom-if" if="{{user}}">
+                <template is="dom-if" if="{{user.displayName}}">
                     <template is="dom-if" if="{{selectedUser}}">
 
                         <div class="settings layout horizontal wrap center-justified">
@@ -162,7 +155,10 @@
                     lastNObj: Object,
                     gesamtAnwesenheiten: Object,
                     notifies: Array,
-                    selectedUser: String
+                    selectedUser: {
+                        type: String,
+                        value: "rene"
+                    }
                 };
             }
 
@@ -187,7 +183,7 @@
             _asArray(obj) {
                 return Object.keys(obj).map(function (key) {
                     return { key: key, value: obj[key] };
-                });
+                }).filter(user => user.key === this.user.displayName);
             }
 
             _toggleDrawer(event) {
