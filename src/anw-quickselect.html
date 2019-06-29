@@ -82,9 +82,10 @@
                         eventData.message = "Telearbeit";
                         break;
                 }
-                eventData.status = state.toString();
+                eventData.status = state;
                 eventData.until = "";
                 eventData.emoji = "";
+                eventData.location = "";
                 this.dispatchEvent(new CustomEvent('klick', { detail: eventData }));
             }
 
