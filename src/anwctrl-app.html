@@ -112,9 +112,12 @@
                 <template is="dom-if" if="{{!selectedAnwesenheit.name}}">
                     <div main-title>Anwesenheits Controller</div>
                 </template>
-                <paper-icon-button id="shareBtn" icon="icons:launch" on-tap="_openShareDialog"></paper-icon-button>
-                <anw-subscriptions subscriptions="[[selectedAnwesenheit.subscriptions]]"></anw-subscriptions>
-                <paper-icon-button id="btn" icon="{{_getIcon(notifies.length)}}" on-tap="_toggleDrawer"></paper-icon-button>
+
+                <template is="dom-if" if="{{selectedAnwesenheit.name}}">
+                    <paper-icon-button id="shareBtn" icon="icons:launch" on-tap="_openShareDialog"></paper-icon-button>
+                    <anw-subscriptions subscriptions="[[selectedAnwesenheit.subscriptions]]"></anw-subscriptions>
+                    <paper-icon-button id="btn" icon="{{_getIcon(notifies.length)}}" on-tap="_toggleDrawer"></paper-icon-button>
+                </template>
 
                 <paper-progress hidden="{{selectedAnwesenheit.name}}" indeterminate="{{!selectedAnwesenheit.name}}" bottom-item>
                 </paper-progress>
