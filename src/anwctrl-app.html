@@ -16,6 +16,7 @@
 <link rel="import" href="auth-element.html">
 <link rel="import" href="../styles/app-theme.html">
 <link rel="import" href="anw-single.html">
+<link rel="import" href="anw-create.html">
 <link rel="import" href="anw-quickselect.html">
 <link rel="import" href="anw-customselect.html">
 <link rel="import" href="anw-customtime.html">
@@ -92,24 +93,23 @@
             project-id="anwesenheit-550a6" storage-bucket="anwesenheit-550a6.appspot.com" messaging-sender-id="44085346030">
         </firebase-app>
 
-        <firebase-document path="anwesenheiten" data="{{gesamtAnwesenheiten}}"></firebase-document>
-        <firebase-document path="anwesenheiten/[[user.displayName]]" data="{{selectedAnwesenheit}}"></firebase-document>
-        <firebase-document path="notify/[[selectedUser]]" data="{{secondifies}}"></firebase-document>
+        <firebase-document path="anwesenheiten/[[user.uid]]" data="{{selectedAnwesenheit}}"></firebase-document>
+        <firebase-document path="notify/[[selectedAnwesenheit.key]]" data="{{secondifies}}"></firebase-document>
 
-        <firebase-query path="notify/[[selectedUser]]" data="{{notifies}}"></firebase-query>
+        <firebase-query path="notify/[[selectedAnwesenheit.key]]" data="{{notifies}}"></firebase-query>
 
         <app-header reveals>
             <app-toolbar>
-                <template is="dom-if" if="{{user.displayName}}">
+                <template is="dom-if" if="{{selectedAnwesenheit.name}}">
                     <div main-title>Hallo {{selectedAnwesenheit.name}}</div>
                 </template>
-                <template is="dom-if" if="{{!user.displayName}}">
+                <template is="dom-if" if="{{!selectedAnwesenheit.name}}">
                     <div main-title>Anwesenheits Controller</div>
                 </template>
                     <anw-subscriptions subscriptions="[[selectedAnwesenheit.subscriptions]]"></anw-subscriptions>
                 <paper-icon-button id="btn" icon="{{_getIcon(notifies.length)}}" on-tap="_toggleDrawer"></paper-icon-button>
 
-                <paper-progress hidden="{{gesamtAnwesenheiten.sebastian}}" indeterminate="{{!gesamtAnwesenheiten.sebastian}}" bottom-item>
+                <paper-progress hidden="{{selectedAnwesenheit.name}}" indeterminate="{{!selectedAnwesenheit.name}}" bottom-item>
                 </paper-progress>
             </app-toolbar>
 
@@ -124,19 +124,22 @@
 
                 <auth-element user={{user}}></auth-element>
 
-                <template is="dom-if" if="{{user.displayName}}">
-                    <template is="dom-if" if="{{selectedUser}}">
+                <template is="dom-if" if="{{selectedAnwesenheit.key}}">
 
-                        <div class="settings layout horizontal wrap center-justified">
-                            <div class="setting">
-                                <anw-single person={{selectedAnwesenheit}}></anw-single>
-                                <anw-quickselect on-klick="_updateStatus"></anw-quickselect>
-                            </div>
-                            <anw-customselect class="setting" on-save="_updateStatus"></anw-customselect>
-                            <anw-customtime class="setting" current-times="{{selectedAnwesenheit.sprechzeiten}}"></anw-customtime>
+                    <div class="settings layout horizontal wrap center-justified">
+                        <div class="setting">
+                            <anw-single person={{selectedAnwesenheit}}></anw-single>
+                            <anw-quickselect on-klick="_updateStatus"></anw-quickselect>
                         </div>
+                        <anw-customselect class="setting" on-save="_updateStatus"></anw-customselect>
+                        <anw-customtime class="setting" current-times="{{selectedAnwesenheit.sprechzeiten}}"></anw-customtime>
+                    </div>
 
-                    </template>
+                </template>
+                <template is="dom-if" if="{{_checkNewUser(user, selectedAnwesenheit)}}">
+                    <div class="settings layout horizontal wrap center-justified">
+                        <anw-create on-create="_saveNewPerson"></anw-create>
+                    </div>
                 </template>
             </div>
         </div>
@@ -153,17 +156,31 @@
             static get properties() {
                 return {
                     lastNObj: Object,
-                    gesamtAnwesenheiten: Object,
                     notifies: Array,
-                    selectedUser: {
-                        type: String,
-                        value: "rene"
-                    }
+                    user: {
+                        type: Object,
+                        notify: true
+                    },
+                    selectedAnwesenheit: Object
                 };
+            }
+
+            _checkNewUser(user, selectedAnwesenheit) {
+                return this.user !== undefined
+                    && this.user !== null
+                    && this.user.uid !== undefined
+                    && this.selectedAnwesenheit.name === undefined
             }
 
             _delete(event) {
                 this.set('secondifies.' + event.detail, null);
+            }
+
+            _saveNewPerson(event) {
+                const data = event.detail;
+
+                this.set('selectedAnwesenheit', data);
+
             }
 
             _updateStatus(event) {
@@ -180,18 +197,11 @@
                 this.set('selectedAnwesenheit.location', newLocation);
             }
 
-            _asArray(obj) {
-                return Object.keys(obj).map(function (key) {
-                    return { key: key, value: obj[key] };
-                }).filter(user => user.key === this.user.displayName);
-            }
-
             _toggleDrawer(event) {
                 this.$.drawer.toggle();
             }
 
             _getIcon(size) {
-                console.log(size);
                 if (size >= 0 && size <= 9) {
                     return `anwctrl:number-${size}`;
                 } else {

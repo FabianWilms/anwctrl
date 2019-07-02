@@ -1,0 +1,165 @@
+<link rel="import"
+      href="../bower_components/polymer/polymer-element.html">
+<link rel="import"
+      href="../bower_components/vaadin-material-theme/vaadin-date-picker.html">
+<link rel="import"
+      href="../bower_components/vaadin-date-picker/vaadin-date-picker-light.html">
+<link rel="import"
+      href="../bower_components/paper-card/paper-card.html">
+<link rel="import"
+      href="../bower_components/paper-button/paper-button.html">
+<link rel="import"
+      href="../bower_components/paper-input/paper-input.html">
+<link rel="import"
+      href="../bower_components/paper-radio-group/paper-radio-group.html">
+<link rel="import"
+      href="../bower_components/paper-radio-button/paper-radio-button.html">
+<link rel="import"
+      href="../bower_components/app-layout/app-layout.html">
+<link rel="import"
+      href="../bower_components/iron-form/iron-form.html">
+
+<link rel="import"
+      href="https://raw.githubusercontent.com/FabianWilms/anwesenheit/master/styles/anw-style.html">
+
+<dom-module id="anw-create">
+    <template>
+        <style include="anw-style"></style>
+        <style include="iron-flex iron-flex-alignment"></style>
+        <style>
+            :host {
+                display: block;
+                max-width: var(--max-width);
+                width: 100%;
+            }
+
+            .full-width {
+                width: 100%;
+            }
+
+            paper-card {
+                width: 100%;
+                background: white;
+                --paper-card-actions: {
+                    border-top: 1px solid #fafafa;
+                }
+            }
+
+            paper-button {
+                margin: 8px;
+            }
+        </style>
+
+        <paper-card>
+            <div class="card-content">
+                <iron-form id="personForm">
+                    <form>
+                        <h2>Neue Person erstellen</h2>
+                        <div class="layout horizontal">
+                            <paper-input value={{_customState.name}}
+                                         required
+                                         auto-validate
+                                         class="flex"
+                                         id="inputName"
+                                         label="Name"
+                                         always-float-label></paper-input>
+                        </div>
+                        <paper-input value={{_customState.avatar}}
+                                     required
+                                     auto-validate
+                                     class="flex"
+                                     id="inputAvatar"
+                                     label="Avatar-Link"
+                                     always-float-label></paper-input>
+                        <div>Sounds</div>
+                        <paper-input value={{_customState.sounds.zero}}
+                                     required
+                                     auto-validate
+                                     class="flex"
+                                     id="inputSound"
+                                     label="Sound Status: Anwesend"
+                                     always-float-label></paper-input>
+                        <paper-input value={{_customState.sounds.one}}
+                                     required
+                                     auto-validate
+                                     class="flex"
+                                     id="inputSound"
+                                     label="Sound Status: Unterwegs"
+                                     always-float-label></paper-input>
+                        <paper-input value={{_customState.sounds.two}}
+                                     required
+                                     auto-validate
+                                     class="flex"
+                                     id="inputSound"
+                                     label="Sound Status: Abwesend"
+                                     always-float-label></paper-input>
+                    </form>
+                </iron-form>
+            </div>
+            <div class="card-actions">
+                <paper-button class="anw-state foreground"
+                              on-tap="_saveCustom">Speichern</paper-button>
+            </div>
+        </paper-card>
+    </template>
+
+    <script>
+
+        class AnwCreate extends Polymer.Element {
+
+            static get is() {
+                return 'anw-create';
+            }
+
+            static get properties() {
+                return {
+                    _customState: {
+                        type: Object,
+                        value: {
+                            sounds:{}
+                        }
+                    }
+                };
+            }
+
+            _saveCustom() {
+                if(this.$.personForm.validate()) {
+                    var eventData = {
+                        name: this._customState.name,
+                        avatar: this._customState.avatar,
+                        status: 0,
+                        emoji: "",
+                        key: this._customState.name.toLowerCase(),
+                        location: "",
+                        message: "Booting...",
+                        pushnotifier: {
+                            apptoken: "ASK AN ADMIN!"
+                        },
+                        sprechzeiten: {
+                          montag: "",
+                          dienstag: "",
+                          mittwoch: "",
+                          donnerstag: ""
+                        },
+                        sounds: {
+                            0: this._customState.sounds.zero,
+                            1: this._customState.sounds.one,
+                            2: this._customState.sounds.two,
+                        },
+                        until: ""
+                    };
+
+                    this.dispatchEvent(new CustomEvent('create', { detail: eventData }));
+
+                    this.set("_customState", {});
+
+                } else {
+                    console.log("Form nicht valide!!")
+                }
+            }
+
+        }
+
+        window.customElements.define(AnwCreate.is, AnwCreate);
+    </script>
+</dom-module>
