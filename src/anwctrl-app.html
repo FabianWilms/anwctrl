@@ -21,6 +21,7 @@
 <link rel="import" href="anw-quickselect.html">
 <link rel="import" href="anw-customselect.html">
 <link rel="import" href="anw-customtime.html">
+<link rel="import" href="anw-customsounds.html">
 <link rel="import" href="anw-notifications/anw-notifications.html">
 <link rel="import" href="anw-subscriptions.html">
 <link rel="import" href="anwctrl-icons.html">
@@ -139,6 +140,7 @@
                         </div>
                         <anw-customselect class="setting" on-save="_updateStatus"></anw-customselect>
                         <anw-customtime class="setting" current-times="{{selectedAnwesenheit.sprechzeiten}}"></anw-customtime>
+                        <anw-customsounds class="setting" sounds="{{selectedAnwesenheit.sounds}}"></anw-customsounds>
                     </div>
 
                 </template>

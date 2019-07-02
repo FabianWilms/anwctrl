@@ -71,28 +71,6 @@
                                      id="inputAvatar"
                                      label="Avatar-Link"
                                      always-float-label></paper-input>
-                        <div>Sounds</div>
-                        <paper-input value={{_customState.sounds.zero}}
-                                     required
-                                     auto-validate
-                                     class="flex"
-                                     id="inputSound"
-                                     label="Sound Status: Anwesend"
-                                     always-float-label></paper-input>
-                        <paper-input value={{_customState.sounds.one}}
-                                     required
-                                     auto-validate
-                                     class="flex"
-                                     id="inputSound"
-                                     label="Sound Status: Unterwegs"
-                                     always-float-label></paper-input>
-                        <paper-input value={{_customState.sounds.two}}
-                                     required
-                                     auto-validate
-                                     class="flex"
-                                     id="inputSound"
-                                     label="Sound Status: Abwesend"
-                                     always-float-label></paper-input>
                     </form>
                 </iron-form>
             </div>
@@ -142,9 +120,9 @@
                           donnerstag: ""
                         },
                         sounds: {
-                            0: this._customState.sounds.zero,
-                            1: this._customState.sounds.one,
-                            2: this._customState.sounds.two,
+                            0: "",
+                            1: "",
+                            2: "",
                         },
                         until: ""
                     };
