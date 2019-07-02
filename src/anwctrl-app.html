@@ -4,6 +4,7 @@
 <link rel="import" href="../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
 <link rel="import" href="../bower_components/paper-tabs/paper-tab.html">
+<link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../bower_components/neon-animation/web-animations.html">
 <link rel="import" href="../bower_components/polymerfire/firebase-app.html">
@@ -85,6 +86,10 @@
                 color: var(--secondary-text-color);
                 padding-right: 8px;
             }
+
+            #shareID {
+                margin: 3rem;
+            }
         </style>
 
         <style include="iron-flex iron-flex-alignment"></style>
@@ -106,7 +111,8 @@
                 <template is="dom-if" if="{{!selectedAnwesenheit.name}}">
                     <div main-title>Anwesenheits Controller</div>
                 </template>
-                    <anw-subscriptions subscriptions="[[selectedAnwesenheit.subscriptions]]"></anw-subscriptions>
+                <paper-icon-button id="shareBtn" icon="icons:launch" on-tap="_openShareDialog"></paper-icon-button>
+                <anw-subscriptions subscriptions="[[selectedAnwesenheit.subscriptions]]"></anw-subscriptions>
                 <paper-icon-button id="btn" icon="{{_getIcon(notifies.length)}}" on-tap="_toggleDrawer"></paper-icon-button>
 
                 <paper-progress hidden="{{selectedAnwesenheit.name}}" indeterminate="{{!selectedAnwesenheit.name}}" bottom-item>
@@ -144,6 +150,14 @@
             </div>
         </div>
 
+        <paper-dialog id="showShareID" with-backdrop>
+            <div class="layout vertical wrap center-justified">
+                <h1>Deine ID zum Teilen</h1>
+                <div id="shareID">{{user.uid}}</div>
+                <paper-button dialog-dismiss>Schließen</paper-button>
+            </div>
+        </paper-dialog>
+
     </template>
 
     <script>
@@ -163,6 +177,10 @@
                     },
                     selectedAnwesenheit: Object
                 };
+            }
+
+            _openShareDialog(event) {
+                this.$.showShareID.open()
             }
 
             _checkNewUser(user, selectedAnwesenheit) {
