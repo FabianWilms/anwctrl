@@ -4,6 +4,7 @@
 <link rel="import" href="../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
 <link rel="import" href="../bower_components/paper-tabs/paper-tab.html">
+<link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../bower_components/neon-animation/web-animations.html">
 <link rel="import" href="../bower_components/polymerfire/firebase-app.html">
@@ -16,9 +17,11 @@
 <link rel="import" href="auth-element.html">
 <link rel="import" href="../styles/app-theme.html">
 <link rel="import" href="anw-single.html">
+<link rel="import" href="anw-create.html">
 <link rel="import" href="anw-quickselect.html">
 <link rel="import" href="anw-customselect.html">
 <link rel="import" href="anw-customtime.html">
+<link rel="import" href="anw-customsounds.html">
 <link rel="import" href="anw-notifications/anw-notifications.html">
 <link rel="import" href="anw-subscriptions.html">
 <link rel="import" href="anwctrl-icons.html">
@@ -84,6 +87,10 @@
                 color: var(--secondary-text-color);
                 padding-right: 8px;
             }
+
+            #shareID {
+                margin: 3rem;
+            }
         </style>
 
         <style include="iron-flex iron-flex-alignment"></style>
@@ -92,38 +99,34 @@
             project-id="anwesenheit-550a6" storage-bucket="anwesenheit-550a6.appspot.com" messaging-sender-id="44085346030">
         </firebase-app>
 
-        <firebase-document path="anwesenheiten" data="{{gesamtAnwesenheiten}}"></firebase-document>
-        <firebase-document path="anwesenheiten/[[selectedUser]]" data="{{selectedAnwesenheit}}"></firebase-document>
-        <firebase-document path="notify/[[selectedUser]]" data="{{secondifies}}"></firebase-document>
+        <firebase-document path="anwesenheiten/[[user.uid]]" data="{{selectedAnwesenheit}}"></firebase-document>
+        <firebase-document path="notify/[[selectedAnwesenheit.key]]" data="{{secondifies}}"></firebase-document>
 
-        <firebase-query path="notify/[[selectedUser]]" data="{{notifies}}"></firebase-query>
-
-        <app-localstorage-document key="selectedUser" data="{{selectedUser}}"></app-localstorage-document>
+        <firebase-query path="notify/[[selectedAnwesenheit.key]]" data="{{notifies}}"></firebase-query>
 
         <app-header reveals>
             <app-toolbar>
-                <div main-title>Anwesenheits Controller</div>
-                <template is="dom-if" if="{{selectedUser}}">
+                <template is="dom-if" if="{{selectedAnwesenheit.name}}">
+                    <div main-title>Hallo {{selectedAnwesenheit.name}}</div>
+                </template>
+                <template is="dom-if" if="{{!selectedAnwesenheit.name}}">
+                    <div main-title>Anwesenheits Controller</div>
+                </template>
+
+                <template is="dom-if" if="{{selectedAnwesenheit.name}}">
+                    <paper-icon-button id="shareBtn" icon="icons:launch" on-tap="_openShareDialog"></paper-icon-button>
                     <anw-subscriptions subscriptions="[[selectedAnwesenheit.subscriptions]]"></anw-subscriptions>
+                    <paper-icon-button id="btn" icon="{{_getIcon(notifies.length)}}" on-tap="_toggleDrawer"></paper-icon-button>
                 </template>
-                <paper-icon-button id="btn" icon="{{_getIcon(notifies.length)}}" on-tap="_toggleDrawer"></paper-icon-button>
+
+                <paper-progress hidden="{{selectedAnwesenheit.name}}" indeterminate="{{!selectedAnwesenheit.name}}" bottom-item>
+                </paper-progress>
             </app-toolbar>
-
-            <paper-tabs attr-for-selected="value" selected="{{selectedUser}}" selected="0" scrollable>
-                <template is="dom-if" if="{{user}}">
-                    <template is="dom-repeat" items="[[_asArray(gesamtAnwesenheiten)]]">
-                        <paper-tab value$="{{item.key}}">{{item.value.name}}</paper-tab>
-                    </template>
-                </template>
-            </paper-tabs>
-
-            <paper-progress hidden="{{gesamtAnwesenheiten.sebastian}}" indeterminate="{{!gesamtAnwesenheiten.sebastian}}" bottom-item>
-            </paper-progress>
 
         </app-header>
 
         <app-drawer id="drawer" align="end" swipe-open>
-            <anw-notifications on-delete="_delete" notifies={{notifies}}></anw-notificiations>
+            <anw-notifications on-delete="_delete" notifies={{notifies}}></anw-notifications>
         </app-drawer>
 
         <div class="layout horizontal">
@@ -131,22 +134,34 @@
 
                 <auth-element user={{user}}></auth-element>
 
-                <template is="dom-if" if="{{user}}">
-                    <template is="dom-if" if="{{selectedUser}}">
+                <template is="dom-if" if="{{selectedAnwesenheit.key}}">
 
-                        <div class="settings layout horizontal wrap center-justified">
-                            <div class="setting">
-                                <anw-single person={{selectedAnwesenheit}}></anw-single>
-                                <anw-quickselect on-klick="_updateStatus"></anw-quickselect>
-                            </div>
-                            <anw-customselect class="setting" on-save="_updateStatus"></anw-customselect>
-                            <anw-customtime class="setting" current-times="{{selectedAnwesenheit.sprechzeiten}}"></anw-customtime>
+                    <div class="settings layout horizontal wrap center-justified">
+                        <div class="setting">
+                            <anw-single person={{selectedAnwesenheit}}></anw-single>
+                            <anw-quickselect on-klick="_updateStatus"></anw-quickselect>
                         </div>
+                        <anw-customselect class="setting" on-save="_updateStatus"></anw-customselect>
+                        <anw-customtime class="setting" current-times="{{selectedAnwesenheit.sprechzeiten}}"></anw-customtime>
+                        <anw-customsounds class="setting" sounds="{{selectedAnwesenheit.sounds}}"></anw-customsounds>
+                    </div>
 
-                    </template>
+                </template>
+                <template is="dom-if" if="{{_checkNewUser(user, selectedAnwesenheit)}}">
+                    <div class="settings layout horizontal wrap center-justified">
+                        <anw-create on-create="_saveNewPerson"></anw-create>
+                    </div>
                 </template>
             </div>
         </div>
+
+        <paper-dialog id="showShareID" with-backdrop>
+            <div class="layout vertical wrap center-justified">
+                <h1>Deine ID zum Teilen</h1>
+                <div id="shareID">{{user.uid}}</div>
+                <paper-button dialog-dismiss>Schließen</paper-button>
+            </div>
+        </paper-dialog>
 
     </template>
 
@@ -160,14 +175,35 @@
             static get properties() {
                 return {
                     lastNObj: Object,
-                    gesamtAnwesenheiten: Object,
                     notifies: Array,
-                    selectedUser: String
+                    user: {
+                        type: Object,
+                        notify: true
+                    },
+                    selectedAnwesenheit: Object
                 };
+            }
+
+            _openShareDialog(event) {
+                this.$.showShareID.open()
+            }
+
+            _checkNewUser(user, selectedAnwesenheit) {
+                return this.user !== undefined
+                    && this.user !== null
+                    && this.user.uid !== undefined
+                    && this.selectedAnwesenheit.name === undefined
             }
 
             _delete(event) {
                 this.set('secondifies.' + event.detail, null);
+            }
+
+            _saveNewPerson(event) {
+                const data = event.detail;
+
+                this.set('selectedAnwesenheit', data);
+
             }
 
             _updateStatus(event) {
@@ -184,18 +220,11 @@
                 this.set('selectedAnwesenheit.location', newLocation);
             }
 
-            _asArray(obj) {
-                return Object.keys(obj).map(function (key) {
-                    return { key: key, value: obj[key] };
-                });
-            }
-
             _toggleDrawer(event) {
                 this.$.drawer.toggle();
             }
 
             _getIcon(size) {
-                console.log(size);
                 if (size >= 0 && size <= 9) {
                     return `anwctrl:number-${size}`;
                 } else {
