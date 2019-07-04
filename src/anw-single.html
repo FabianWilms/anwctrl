@@ -2,6 +2,7 @@
 <link rel="import" href="../bower_components/paper-card/paper-card.html">
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../bower_components/paper-spinner/paper-spinner.html">
+<link rel="import" href="../bower_components/paper-toast/paper-toast.html">
 <link rel="import" href="../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../bower_components/polymerfire/firebase-storage-ref.html">
@@ -91,6 +92,8 @@
 
     <input id="avatarPicker" type="file" accept="image/*" capture="user">
 
+    <paper-toast id="toast"></paper-toast>
+
     <paper-card class="anw-state background" state$="[[person.status]]">
       <div class="layout horizontal center card-header">
         <span class="flex">[[person.name]]</span>
@@ -154,22 +157,41 @@
       ready() {
         super.ready();
         var fileInput = this.shadowRoot.querySelector('#avatarPicker');
-        var spinner = this.shadowRoot.querySelector('paper-spinner');
         fileInput.addEventListener('change', () => {
+          var toast = this.shadowRoot.querySelector('#toast');
+          var spinner = this.shadowRoot.querySelector('paper-spinner');
           var storage = this.shadowRoot.querySelector('#storage');
 
           var selectedFiles = fileInput.files;
           if (selectedFiles.length === 0) {
+            toast.text = "Du hast kein Bild ausgewählt."
+            toast.show();
             console.warn("no file selected");
             return;
           } else {
             spinner.active = true;
             const selectedFile = selectedFiles[0];
+
             console.log("selected file: ", {
-              type: typeof selectedFile,
               name: selectedFile.name,
-              size: this.getFileSize(selectedFile.size)
+              size: selectedFile.size,
+              type: selectedFile.type
             })
+
+            // Maximal 1000000 byte == 1MB
+            if(selectedFile.size > 1000000) {
+              toast.text = "Die maximale Dateigröße beträgt 1MB. Bitte wähle ein anderes Bild aus."
+              toast.show();
+              spinner.active = false;
+              return;
+            }
+
+            if(!selectedFile.type.startsWith("image/")) {
+              toast.text = `Dateien vom Typ ${selectedFile.type} sind nicht erlaubt.`
+              toast.show();
+              spinner.active = false;
+              return;
+            }
 
             storage.path = `/avatars/${this.person.uid}`;
             var uploadTask = storage.put(selectedFile);
@@ -211,6 +233,8 @@
                 // Upload completed successfully, now we can get the download URL
                 var downloadURL = uploadTask.snapshot.downloadURL;
                 this.set('person.avatar', downloadURL);
+                toast.text = "Neuer Avatar wurde erfolgreich hochgeladen."
+                toast.open();
                 spinner.active = false;
               });
           }
@@ -219,16 +243,6 @@
 
       _uploadNewAvatar(e) {
         this.shadowRoot.querySelector('#avatarPicker').click();
-      }
-
-      getFileSize(number) {
-        if (number < 1024) {
-          return number + 'bytes';
-        } else if (number >= 1024 && number < 1048576) {
-          return (number / 1024).toFixed(1) + 'KB';
-        } else if (number >= 1048576) {
-          return (number / 1048576).toFixed(1) + 'MB';
-        }
       }
 
     }
