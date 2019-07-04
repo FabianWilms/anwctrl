@@ -12,7 +12,6 @@
 <link rel="import" href="../bower_components/polymerfire/firebase-query.html">
 <link rel="import" href="../bower_components/app-storage/app-localstorage/app-localstorage-document.html">
 <link rel="import" href="../bower_components/app-layout/app-layout.html">
-<link rel="import" href="../bower_components/paper-progress/paper-progress.html">
 
 <link rel="import" href="auth-element.html">
 <link rel="import" href="../styles/app-theme.html">
@@ -36,7 +35,7 @@
 
             .main-content {
                 width: 100%;
-                padding-top: 100px;
+                padding-top: 46px;
                 margin-bottom: 32px;
             }
 
@@ -61,7 +60,7 @@
 
             app-drawer {
                 z-index: 999;
-                top: 112px;
+                top: 64px;
                 --app-drawer-content-container: {
                     padding: 0px;
                     background-color: #eee;
@@ -69,12 +68,6 @@
                 --app-drawer-width: 320px;
             }
 
-            paper-progress {
-                width: 100%;
-                --paper-progress-active-color: #448aff;
-                --paper-progress-container-color: #4fcfff;
-            }
-            
             div.settings {
                 padding: 32px;
             }
@@ -119,8 +112,6 @@
                     <paper-icon-button id="btn" icon="{{_getIcon(notifies.length)}}" on-tap="_toggleDrawer"></paper-icon-button>
                 </template>
 
-                <paper-progress hidden="{{selectedAnwesenheit.name}}" indeterminate="{{!selectedAnwesenheit.name}}" bottom-item>
-                </paper-progress>
             </app-toolbar>
 
         </app-header>
