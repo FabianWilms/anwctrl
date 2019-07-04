@@ -1,14 +1,16 @@
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
 <link rel="import" href="../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/paper-spinner/paper-spinner.html">
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../bower_components/polymerfire/firebase-storage-ref.html">
 
 <link rel="import" href="https://raw.githubusercontent.com/FabianWilms/anwesenheit/master/styles/anw-style.html">
 
 <dom-module id="anw-single">
   <template>
-    <style include="anw-style"></style>
-    <style include="iron-flex iron-flex-alignment"></style>
-    <style>
+    <style include="anw-style iron-flex iron-flex-alignment">
       :host {
         display: block;
         max-width: var(--max-width);
@@ -31,18 +33,70 @@
       .img-circle {
         border-radius: 50%;
         width: 50px;
+        height: 50px;
+        filter: blur(0px) brightness(1);
+        transition: filter 0.3s;
       }
 
       td.fieldname {
         text-align: right;
         padding-right: 10px;
       }
+
+      #avatarPicker {
+        position: absolute;
+        top: -1000;
+      }
+
+      paper-icon-button {        
+        visibility: hidden;
+        opacity: 0;
+        
+        position: absolute;
+        top: 10px;
+        right: 16px;
+        width: 48px;
+        height: 48px;
+
+        transition: all 0.3s;
+      }
+
+      paper-spinner {
+        pointer-events: none;
+        position: absolute;
+        top: 10px;
+        right: 14px;
+        width: 54px;
+        height: 54px;
+
+        --paper-spinner-stroke-width: 5px;
+        --paper-spinner-layer-1-color: var(--anw-state-0);
+        --paper-spinner-layer-2-color: var(--anw-state-1);
+        --paper-spinner-layer-3-color: var(--anw-state-2);
+        --paper-spinner-layer-4-color: var(--anw-state-3);
+      }
+
+      paper-card:hover paper-icon-button {
+        visibility: visible;
+        opacity: 1;
+      }
+
+      paper-card:hover .img-circle {
+        filter: blur(2px) brightness(2);
+      }
     </style>
+
+    <firebase-storage-ref id="storage">
+    </firebase-storage-ref>
+
+    <input id="avatarPicker" type="file" accept="image/*" capture="user">
 
     <paper-card class="anw-state background" state$="[[person.status]]">
       <div class="layout horizontal center card-header">
         <span class="flex">[[person.name]]</span>
         <img src="[[person.avatar]]" class="img-circle"></img>
+        <paper-icon-button on-tap="_uploadNewAvatar" icon="cloud-upload"></paper-icon-button>
+        <paper-spinner></paper-spinner>
       </div>
 
       <div class="card-content">
@@ -95,6 +149,86 @@
             type: Object
           }
         };
+      }
+
+      ready() {
+        super.ready();
+        var fileInput = this.shadowRoot.querySelector('#avatarPicker');
+        var spinner = this.shadowRoot.querySelector('paper-spinner');
+        fileInput.addEventListener('change', () => {
+          var storage = this.shadowRoot.querySelector('#storage');
+
+          var selectedFiles = fileInput.files;
+          if (selectedFiles.length === 0) {
+            console.warn("no file selected");
+            return;
+          } else {
+            spinner.active = true;
+            const selectedFile = selectedFiles[0];
+            console.log("selected file: ", {
+              type: typeof selectedFile,
+              name: selectedFile.name,
+              size: this.getFileSize(selectedFile.size)
+            })
+
+            storage.path = `/avatars/${this.person.uid}`;
+            var uploadTask = storage.put(selectedFile);
+
+            uploadTask.on('state_changed',
+              (snapshot) => {
+                // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+                var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                console.log('Upload is ' + progress + '% done');
+                switch (snapshot.state) {
+                  case 'paused':
+                    console.log('Upload is paused');
+                    break;
+                  case 'running':
+                    console.log('Upload is running');
+                    break;
+                }
+              },
+              (error) => {
+                switch (error.code) {
+                  case 'storage/unauthorized':
+                    // User doesn't have permission to access the object
+                    console.error('You dont have permission to access object');
+                    break;
+
+                  case 'storage/canceled':
+                    // User canceled the upload
+                    console.error('User cancelled upload');
+                    break;
+
+                  case 'storage/unknown':
+                    // Unknown error occurred, inspect error.serverResponse
+                    console.error(error.code);
+                    break;
+                }
+                spinner.active = false;
+              },
+              () => {
+                // Upload completed successfully, now we can get the download URL
+                var downloadURL = uploadTask.snapshot.downloadURL;
+                this.set('person.avatar', downloadURL);
+                spinner.active = false;
+              });
+          }
+        });
+      }
+
+      _uploadNewAvatar(e) {
+        this.shadowRoot.querySelector('#avatarPicker').click();
+      }
+
+      getFileSize(number) {
+        if (number < 1024) {
+          return number + 'bytes';
+        } else if (number >= 1024 && number < 1048576) {
+          return (number / 1024).toFixed(1) + 'KB';
+        } else if (number >= 1048576) {
+          return (number / 1048576).toFixed(1) + 'MB';
+        }
       }
 
     }
