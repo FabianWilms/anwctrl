@@ -1,8 +1,9 @@
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
 <link rel="import" href="../bower_components/paper-card/paper-card.html">
-<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../bower_components/paper-spinner/paper-spinner.html">
 <link rel="import" href="../bower_components/paper-toast/paper-toast.html">
+<link rel="import" href="../bower_components/iron-icon/iron-icon.html">
 <link rel="import" href="../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../bower_components/polymerfire/firebase-storage-ref.html">
@@ -49,22 +50,22 @@
         top: -1000;
       }
 
-      paper-icon-button {        
-        visibility: hidden;
-        opacity: 0;
-        
-        position: absolute;
-        top: 10px;
-        right: 16px;
-        width: 48px;
-        height: 48px;
+      paper-button {
+        font-size: 10px;
+        background: white;
+        margin-right: 16px;
+      }
 
-        transition: all 0.3s;
+      paper-button > iron-icon {
+        padding-right: 8px;
+        height: 16px;
+        width: 16px;
       }
 
       paper-spinner {
         pointer-events: none;
         position: absolute;
+        z-index: 1;
         top: 10px;
         right: 14px;
         width: 54px;
@@ -75,15 +76,6 @@
         --paper-spinner-layer-2-color: var(--anw-state-1);
         --paper-spinner-layer-3-color: var(--anw-state-2);
         --paper-spinner-layer-4-color: var(--anw-state-3);
-      }
-
-      paper-card:hover paper-icon-button {
-        visibility: visible;
-        opacity: 1;
-      }
-
-      paper-card:hover .img-circle {
-        filter: blur(2px) brightness(2);
       }
     </style>
 
@@ -97,8 +89,8 @@
     <paper-card class="anw-state background" state$="[[person.status]]">
       <div class="layout horizontal center card-header">
         <span class="flex">[[person.name]]</span>
+        <paper-button on-tap="_uploadNewAvatar"><iron-icon icon="cloud-upload"></iron-icon>Avatar ändern</paper-button>
         <img src="[[person.avatar]]" class="img-circle"></img>
-        <paper-icon-button on-tap="_uploadNewAvatar" icon="cloud-upload"></paper-icon-button>
         <paper-spinner></paper-spinner>
       </div>
 
