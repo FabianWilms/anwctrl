@@ -108,9 +108,9 @@
         <paper-card class="anw-state background" state$="[[person.status]]">
             <div class="layout horizontal center card-header">
                 <span class="flex">[[person.name]]</span>
-                <paper-button class="container" on-tap="_uploadNewAvatar">
+                <paper-button noink class="container" on-tap="_uploadNewAvatar">
                     <img src="[[person.avatar]]" class="img-circle"/>
-                    <paper-fab mini icon="icons:camera-enhance"></paper-fab>
+                    <paper-fab noink mini icon="icons:camera-enhance"></paper-fab>
                     <paper-spinner></paper-spinner>
                 </paper-button>
             </div>
