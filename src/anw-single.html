@@ -68,10 +68,9 @@
                 pointer-events: none;
                 position: absolute;
                 z-index: 1;
-                top: 10px;
-                right: 14px;
-                width: 105px;
-                height: 105px;
+                top: 0;
+                width: 100px;
+                height: 100px;
 
                 --paper-spinner-stroke-width: 5px;
                 --paper-spinner-layer-1-color: var(--anw-state-0);
@@ -80,21 +79,23 @@
                 --paper-spinner-layer-4-color: var(--anw-state-3);
             }
 
-            div.container {
+            paper-button.container {
                 position: relative;
                 width: fit-content;
+                background-color: transparent;
+                border-radius: 50%;
             }
 
             paper-fab {
                 display: block;
                 position: absolute;
                 cursor: pointer;
-                right: 0px;
-                bottom: 0px;
+                right: 0;
+                bottom: 0;
                 --paper-fab-background: white;
                 --paper-fab-keyboard-focus-background: white;
                 color: lightgray;
-                font-size: 20px;
+                font-size: 15px;
             }
         </style>
 
@@ -107,11 +108,11 @@
         <paper-card class="anw-state background" state$="[[person.status]]">
             <div class="layout horizontal center card-header">
                 <span class="flex">[[person.name]]</span>
-                <div class="container" on-click="_uploadNewAvatar">
+                <paper-button class="container" on-tap="_uploadNewAvatar">
                     <img src="[[person.avatar]]" class="img-circle"/>
                     <paper-fab mini icon="icons:camera-enhance"></paper-fab>
-                </div>
-                <paper-spinner></paper-spinner>
+                    <paper-spinner></paper-spinner>
+                </paper-button>
             </div>
 
             <div class="card-content">
@@ -165,95 +166,102 @@
                 return {
                     person: {
                         type: Object
+                    },
+                    profilePointer: {
+                        type: Object,
+                        observer: "_uploadNewAvatar"
                     }
                 };
             }
 
             ready() {
                 super.ready();
+
                 var fileInput = this.shadowRoot.querySelector('#avatarPicker');
-                fileInput.addEventListener('change', () => {
-                    var toast = this.shadowRoot.querySelector('#toast');
-                    var spinner = this.shadowRoot.querySelector('paper-spinner');
-                    var storage = this.shadowRoot.querySelector('#storage');
+                fileInput.addEventListener('change', e => this.saveProfileImage(e));
+            }
 
-                    var selectedFiles = fileInput.files;
-                    if (selectedFiles.length === 0) {
-                        toast.text = "Du hast kein Bild ausgewählt."
+            saveProfileImage(e) {
+                var toast = this.shadowRoot.querySelector('#toast');
+                var spinner = this.shadowRoot.querySelector('paper-spinner');
+                var storage = this.shadowRoot.querySelector('#storage');
+
+                var selectedFiles = e.target.files;
+                if (selectedFiles.length === 0) {
+                    toast.text = "Du hast kein Bild ausgewählt.";
+                    toast.show();
+                    console.warn("no file selected");
+
+                } else {
+                    spinner.active = true;
+                    const selectedFile = selectedFiles[0];
+
+                    console.log("selected file: ", {
+                        name: selectedFile.name,
+                        size: selectedFile.size,
+                        type: selectedFile.type
+                    });
+
+                    // Maximal 1000000 byte == 1MB
+                    if (selectedFile.size > 1000000) {
+                        toast.text = "Die maximale Dateigröße beträgt 1MB. Bitte wähle ein anderes Bild aus.";
                         toast.show();
-                        console.warn("no file selected");
+                        spinner.active = false;
                         return;
-                    } else {
-                        spinner.active = true;
-                        const selectedFile = selectedFiles[0];
-
-                        console.log("selected file: ", {
-                            name: selectedFile.name,
-                            size: selectedFile.size,
-                            type: selectedFile.type
-                        })
-
-                        // Maximal 1000000 byte == 1MB
-                        if (selectedFile.size > 1000000) {
-                            toast.text = "Die maximale Dateigröße beträgt 1MB. Bitte wähle ein anderes Bild aus."
-                            toast.show();
-                            spinner.active = false;
-                            return;
-                        }
-
-                        if (!selectedFile.type.startsWith("image/")) {
-                            toast.text = `Dateien vom Typ ${selectedFile.type} sind nicht erlaubt.`
-                            toast.show();
-                            spinner.active = false;
-                            return;
-                        }
-
-                        storage.path = `/avatars/${this.person.uid}`;
-                        var uploadTask = storage.put(selectedFile);
-
-                        uploadTask.on('state_changed',
-                            (snapshot) => {
-                                // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
-                                var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                                console.log('Upload is ' + progress + '% done');
-                                switch (snapshot.state) {
-                                    case 'paused':
-                                        console.log('Upload is paused');
-                                        break;
-                                    case 'running':
-                                        console.log('Upload is running');
-                                        break;
-                                }
-                            },
-                            (error) => {
-                                switch (error.code) {
-                                    case 'storage/unauthorized':
-                                        // User doesn't have permission to access the object
-                                        console.error('You dont have permission to access object');
-                                        break;
-
-                                    case 'storage/canceled':
-                                        // User canceled the upload
-                                        console.error('User cancelled upload');
-                                        break;
-
-                                    case 'storage/unknown':
-                                        // Unknown error occurred, inspect error.serverResponse
-                                        console.error(error.code);
-                                        break;
-                                }
-                                spinner.active = false;
-                            },
-                            () => {
-                                // Upload completed successfully, now we can get the download URL
-                                var downloadURL = uploadTask.snapshot.downloadURL;
-                                this.set('person.avatar', downloadURL);
-                                toast.text = "Neuer Avatar wurde erfolgreich hochgeladen."
-                                toast.open();
-                                spinner.active = false;
-                            });
                     }
-                });
+
+                    if (!selectedFile.type.startsWith("image/")) {
+                        toast.text = `Dateien vom Typ ${selectedFile.type} sind nicht erlaubt.`;
+                        toast.show();
+                        spinner.active = false;
+                        return;
+                    }
+
+                    storage.path = `/avatars/${this.person.uid}`;
+                    var uploadTask = storage.put(selectedFile);
+
+                    uploadTask.on('state_changed',
+                        (snapshot) => {
+                            // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+                            var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                            console.log('Upload is ' + progress + '% done');
+                            switch (snapshot.state) {
+                                case 'paused':
+                                    console.log('Upload is paused');
+                                    break;
+                                case 'running':
+                                    console.log('Upload is running');
+                                    break;
+                            }
+                        },
+                        (error) => {
+                            switch (error.code) {
+                                case 'storage/unauthorized':
+                                    // User doesn't have permission to access the object
+                                    console.error('You dont have permission to access object');
+                                    break;
+
+                                case 'storage/canceled':
+                                    // User canceled the upload
+                                    console.error('User cancelled upload');
+                                    break;
+
+                                case 'storage/unknown':
+                                    // Unknown error occurred, inspect error.serverResponse
+                                    console.error(error.code);
+                                    break;
+                            }
+                            spinner.active = false;
+                        },
+                        () => {
+                            // Upload completed successfully, now we can get the download URL
+                            var downloadURL = uploadTask.snapshot.downloadURL;
+                            this.set('person.avatar', downloadURL);
+                            toast.text = "Neuer Avatar wurde erfolgreich hochgeladen.";
+                            toast.open();
+                            spinner.active = false;
+                        });
+                }
             }
 
             _uploadNewAvatar(e) {
