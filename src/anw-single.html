@@ -7,238 +7,236 @@
 <link rel="import" href="../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../bower_components/polymerfire/firebase-storage-ref.html">
+<link rel="import" href="../bower_components/file-input/image-input.html">
 
 <link rel="import" href="https://raw.githubusercontent.com/FabianWilms/anwesenheit/master/styles/anw-style.html">
 
 <dom-module id="anw-single">
-  <template>
-    <style include="anw-style iron-flex iron-flex-alignment">
-      :host {
-        display: block;
-        max-width: var(--max-width);
-        width: 100%;
-      }
-
-      paper-card {
-        width: 100%;
-      }
-
-      .card-header {
-        font-size: 32px;
-        padding: 12px 16px 8px 16px;
-      }
-
-      .card-content {
-        padding: 8px 16px 8px 16px;
-      }
-
-      .img-circle {
-        border-radius: 50%;
-        width: 50px;
-        height: 50px;
-        filter: blur(0px) brightness(1);
-        transition: filter 0.3s;
-      }
-
-      td.fieldname {
-        text-align: right;
-        padding-right: 10px;
-      }
-
-      #avatarPicker {
-        position: absolute;
-        top: -1000;
-      }
-
-      paper-button {
-        font-size: 10px;
-        background: white;
-        margin-right: 16px;
-      }
-
-      paper-button > iron-icon {
-        padding-right: 8px;
-        height: 16px;
-        width: 16px;
-      }
-
-      paper-spinner {
-        pointer-events: none;
-        position: absolute;
-        z-index: 1;
-        top: 10px;
-        right: 14px;
-        width: 54px;
-        height: 54px;
-
-        --paper-spinner-stroke-width: 5px;
-        --paper-spinner-layer-1-color: var(--anw-state-0);
-        --paper-spinner-layer-2-color: var(--anw-state-1);
-        --paper-spinner-layer-3-color: var(--anw-state-2);
-        --paper-spinner-layer-4-color: var(--anw-state-3);
-      }
-    </style>
-
-    <firebase-storage-ref id="storage">
-    </firebase-storage-ref>
-
-    <input id="avatarPicker" type="file" accept="image/*">
-
-    <paper-toast id="toast"></paper-toast>
-
-    <paper-card class="anw-state background" state$="[[person.status]]">
-      <div class="layout horizontal center card-header">
-        <span class="flex">[[person.name]]</span>
-        <paper-button on-tap="_uploadNewAvatar"><iron-icon icon="cloud-upload"></iron-icon>Avatar ändern</paper-button>
-        <img src="[[person.avatar]]" class="img-circle"></img>
-        <paper-spinner></paper-spinner>
-      </div>
-
-      <div class="card-content">
-        <table>
-          <tr>
-            <td class="fieldname">
-              <b>Status</b>
-            </td>
-            <td>[[person.status]]</td>
-          </tr>
-          <tr>
-            <td class="fieldname">
-              <b>Message</b>
-            </td>
-            <td>[[person.message]]</td>
-          </tr>
-          <tr>
-            <td class="fieldname">
-              <b>Location</b>
-            </td>
-            <td>[[person.location]]</td>
-          </tr>
-          <tr>
-            <td class="fieldname">
-              <b>Emoji</b>
-            </td>
-            <td>[[person.emoji]]</td>
-          </tr>
-          <tr>
-            <td class="fieldname">
-              <b>Abwesend bis</b>
-            </td>
-            <td>[[person.until]]</td>
-          </tr>
-        </table>
-      </div>
-    </paper-card>
-  </template>
-
-  <script>
-    /**
-     * @customElement
-     * @polymer
-     */
-    class AnwSingle extends Polymer.Element {
-      static get is() { return 'anw-single'; }
-      static get properties() {
-        return {
-          person: {
-            type: Object
-          }
-        };
-      }
-
-      ready() {
-        super.ready();
-        var fileInput = this.shadowRoot.querySelector('#avatarPicker');
-        fileInput.addEventListener('change', () => {
-          var toast = this.shadowRoot.querySelector('#toast');
-          var spinner = this.shadowRoot.querySelector('paper-spinner');
-          var storage = this.shadowRoot.querySelector('#storage');
-
-          var selectedFiles = fileInput.files;
-          if (selectedFiles.length === 0) {
-            toast.text = "Du hast kein Bild ausgewählt."
-            toast.show();
-            console.warn("no file selected");
-            return;
-          } else {
-            spinner.active = true;
-            const selectedFile = selectedFiles[0];
-
-            console.log("selected file: ", {
-              name: selectedFile.name,
-              size: selectedFile.size,
-              type: selectedFile.type
-            })
-
-            // Maximal 1000000 byte == 1MB
-            if(selectedFile.size > 1000000) {
-              toast.text = "Die maximale Dateigröße beträgt 1MB. Bitte wähle ein anderes Bild aus."
-              toast.show();
-              spinner.active = false;
-              return;
+    <template>
+        <style include="anw-style iron-flex iron-flex-alignment">
+            :host {
+                display: block;
+                max-width: var(--max-width);
+                width: 100%;
             }
 
-            if(!selectedFile.type.startsWith("image/")) {
-              toast.text = `Dateien vom Typ ${selectedFile.type} sind nicht erlaubt.`
-              toast.show();
-              spinner.active = false;
-              return;
+            paper-card {
+                width: 100%;
             }
 
-            storage.path = `/avatars/${this.person.uid}`;
-            var uploadTask = storage.put(selectedFile);
+            .card-header {
+                font-size: 32px;
+                padding: 12px 16px 8px 16px;
+            }
 
-            uploadTask.on('state_changed',
-              (snapshot) => {
-                // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
-                var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                console.log('Upload is ' + progress + '% done');
-                switch (snapshot.state) {
-                  case 'paused':
-                    console.log('Upload is paused');
-                    break;
-                  case 'running':
-                    console.log('Upload is running');
-                    break;
-                }
-              },
-              (error) => {
-                switch (error.code) {
-                  case 'storage/unauthorized':
-                    // User doesn't have permission to access the object
-                    console.error('You dont have permission to access object');
-                    break;
+            .card-content {
+                padding: 8px 16px 8px 16px;
+            }
 
-                  case 'storage/canceled':
-                    // User canceled the upload
-                    console.error('User cancelled upload');
-                    break;
+            .img-circle {
+                border-radius: 50%;
+                width: 50px;
+                height: 50px;
+                filter: blur(0px) brightness(1);
+                transition: filter 0.3s;
+            }
 
-                  case 'storage/unknown':
-                    // Unknown error occurred, inspect error.serverResponse
-                    console.error(error.code);
-                    break;
-                }
-                spinner.active = false;
-              },
-              () => {
-                // Upload completed successfully, now we can get the download URL
-                var downloadURL = uploadTask.snapshot.downloadURL;
-                this.set('person.avatar', downloadURL);
-                toast.text = "Neuer Avatar wurde erfolgreich hochgeladen."
-                toast.open();
-                spinner.active = false;
-              });
-          }
-        });
-      }
+            td.fieldname {
+                text-align: right;
+                padding-right: 10px;
+            }
 
-      _uploadNewAvatar(e) {
-        this.shadowRoot.querySelector('#avatarPicker').click();
-      }
+            paper-button {
+                font-size: 10px;
+                background: white;
+                margin-right: 16px;
+            }
 
-    }
+            paper-button > iron-icon {
+                padding-right: 8px;
+                height: 16px;
+                width: 16px;
+            }
 
-    window.customElements.define(AnwSingle.is, AnwSingle);
-  </script>
+            paper-spinner {
+                pointer-events: none;
+                position: absolute;
+                z-index: 1;
+                top: 10px;
+                right: 14px;
+                width: 54px;
+                height: 54px;
+
+                --paper-spinner-stroke-width: 5px;
+                --paper-spinner-layer-1-color: var(--anw-state-0);
+                --paper-spinner-layer-2-color: var(--anw-state-1);
+                --paper-spinner-layer-3-color: var(--anw-state-2);
+                --paper-spinner-layer-4-color: var(--anw-state-3);
+            }
+
+            image-input.circle {
+                --image-input-button-background: white;
+                --paper-fab-keyboard-focus-background: white;
+                --image-input-button: {
+                    color: lightgray;
+                    font-size: 20px;
+                };
+                --image-input: {
+                    border-radius: 50%;
+                };
+            }
+        </style>
+
+        <firebase-storage-ref id="storage">
+        </firebase-storage-ref>
+
+        <paper-toast id="toast"></paper-toast>
+
+        <paper-card class="anw-state background" state$="[[person.status]]">
+            <div class="layout horizontal center card-header">
+                <span class="flex">[[person.name]]</span>
+                <image-input id="avatarPicker"
+                             class="circle"
+                             accept="image/*"
+                             position="center"
+                             sizing="cover"
+                             width="100" height="100"
+                             preload fade
+                             placeholder="[[person.avatar]]"
+                ></image-input>
+            </div>
+
+            <div class="card-content">
+                <table>
+                    <tr>
+                        <td class="fieldname">
+                            <b>Status</b>
+                        </td>
+                        <td>[[person.status]]</td>
+                    </tr>
+                    <tr>
+                        <td class="fieldname">
+                            <b>Message</b>
+                        </td>
+                        <td>[[person.message]]</td>
+                    </tr>
+                    <tr>
+                        <td class="fieldname">
+                            <b>Location</b>
+                        </td>
+                        <td>[[person.location]]</td>
+                    </tr>
+                    <tr>
+                        <td class="fieldname">
+                            <b>Emoji</b>
+                        </td>
+                        <td>[[person.emoji]]</td>
+                    </tr>
+                    <tr>
+                        <td class="fieldname">
+                            <b>Abwesend bis</b>
+                        </td>
+                        <td>[[person.until]]</td>
+                    </tr>
+                </table>
+            </div>
+        </paper-card>
+    </template>
+
+    <script>
+        /**
+         * @customElement
+         * @polymer
+         */
+        class AnwSingle extends Polymer.Element {
+            static get is() {
+                return 'anw-single';
+            }
+
+            static get properties() {
+                return {
+                    person: {
+                        type: Object
+                    }
+                };
+            }
+
+            ready() {
+                super.ready();
+                var fileInput = this.shadowRoot.querySelector('#avatarPicker');
+                fileInput.addEventListener('changed-files', () => {
+                    var toast = this.shadowRoot.querySelector('#toast');
+                    var storage = this.shadowRoot.querySelector('#storage');
+
+                    const selectedFile = fileInput.value;
+
+                    console.log("selected file: ", {
+                        name: selectedFile.name,
+                        size: selectedFile.size,
+                        type: selectedFile.type
+                    })
+
+                    // Maximal 1000000 byte == 1MB
+                    if (selectedFile.size > 1000000) {
+                        toast.text = "Die maximale Dateigröße beträgt 1MB. Bitte wähle ein anderes Bild aus."
+                        toast.show();
+                        return;
+                    }
+
+                    if (!selectedFile.type.startsWith("image/")) {
+                        toast.text = `Dateien vom Typ ${selectedFile.type} sind nicht erlaubt.`
+                        toast.show();
+                        return;
+                    }
+
+                    storage.path = `/avatars/${this.person.uid}`;
+                    var uploadTask = storage.put(selectedFile);
+
+                    uploadTask.on('state_changed',
+                        (snapshot) => {
+                            // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+                            var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                            console.log('Upload is ' + progress + '% done');
+                            switch (snapshot.state) {
+                                case 'paused':
+                                    console.log('Upload is paused');
+                                    break;
+                                case 'running':
+                                    console.log('Upload is running');
+                                    break;
+                            }
+                        },
+                        (error) => {
+                            switch (error.code) {
+                                case 'storage/unauthorized':
+                                    // User doesn't have permission to access the object
+                                    console.error('You dont have permission to access object');
+                                    break;
+
+                                case 'storage/canceled':
+                                    // User canceled the upload
+                                    console.error('User cancelled upload');
+                                    break;
+
+                                case 'storage/unknown':
+                                    // Unknown error occurred, inspect error.serverResponse
+                                    console.error(error.code);
+                                    break;
+                            }
+                        },
+                        () => {
+                            // Upload completed successfully, now we can get the download URL
+                            var downloadURL = uploadTask.snapshot.downloadURL;
+                            this.set('person.avatar', downloadURL);
+                            toast.text = "Neuer Avatar wurde erfolgreich hochgeladen."
+                            toast.open();
+                        });
+
+                });
+            }
+
+        }
+
+        window.customElements.define(AnwSingle.is, AnwSingle);
+    </script>
 </dom-module>
