@@ -29,8 +29,7 @@
     "iron-form": "PolymerElements/iron-form#^2.0.1",
     "paper-dialog": "PolymerElements/paper-dialog#^2.0.1",
     "paper-spinner": "PolymerElements/paper-spinner#2.1.0",
-    "paper-toast": "PolymerElements/paper-toast#2.1.2",
-    "file-input": "framled/file-input#^2.0.2"
+    "paper-toast": "PolymerElements/paper-toast#2.1.2"
   },
   "devDependencies": {
     "web-component-tester": "Polymer/web-component-tester#^6.0.0",
