@@ -1,24 +1,17 @@
-<link rel="import"
-      href="../bower_components/polymer/polymer-element.html">
-<link rel="import"
-      href="../bower_components/vaadin-material-theme/vaadin-date-picker.html">
-<link rel="import"
-      href="../bower_components/vaadin-date-picker/vaadin-date-picker-light.html">
-<link rel="import"
-      href="../bower_components/paper-card/paper-card.html">
-<link rel="import"
-      href="../bower_components/paper-button/paper-button.html">
-<link rel="import"
-      href="../bower_components/paper-input/paper-input.html">
-<link rel="import"
-      href="../bower_components/paper-radio-group/paper-radio-group.html">
-<link rel="import"
-      href="../bower_components/paper-radio-button/paper-radio-button.html">
-<link rel="import"
-      href="../bower_components/app-layout/app-layout.html">
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/vaadin-material-theme/vaadin-date-picker.html">
+<link rel="import" href="../bower_components/vaadin-date-picker/vaadin-date-picker-light.html">
+<link rel="import" href="../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/paper-spinner/paper-spinner.html">
+<link rel="import" href="../bower_components/iron-icons/maps-icons.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/paper-radio-group/paper-radio-group.html">
+<link rel="import" href="../bower_components/paper-radio-button/paper-radio-button.html">
+<link rel="import" href="../bower_components/app-layout/app-layout.html">
 
-<link rel="import"
-      href="https://raw.githubusercontent.com/FabianWilms/anwesenheit/master/styles/anw-style.html">
+<link rel="import" href="https://raw.githubusercontent.com/FabianWilms/anwesenheit/master/styles/anw-style.html">
 
 <dom-module id="anw-customselect">
     <template>
@@ -38,6 +31,7 @@
             paper-card {
                 width: 100%;
                 background: white;
+
                 --paper-card-actions: {
                     border-top: 1px solid #fafafa;
                 }
@@ -54,49 +48,47 @@
             #inputEmoji {
                 width: 80px;
             }
+
+            #locationSpinner {
+                pointer-events: none;
+                position: absolute;
+                top: 93px;
+                right: 20px;
+                width: 32px;
+                height: 32px;
+            }
         </style>
 
         <paper-card>
             <div class="card-content">
                 <div class="layout horizontal">
-                    <paper-input value={{_customState.message}}
-                                 class="flex"
-                                 id="inputMessage"
-                                 label="Message"
-                                 always-float-label></paper-input>
-                    <paper-input value={{_customState.emoji}}
-                                 id="inputEmoji"
-                                 label="Emoji"
-                                 always-float-label>
+                    <paper-input value={{_customState.message}} class="flex" id="inputMessage" label="Message"
+                        always-float-label></paper-input>
+                    <paper-input value={{_customState.emoji}} id="inputEmoji" label="Emoji" always-float-label>
                     </paper-input>
                 </div>
-                <paper-input value={{_customState.location}}
-                             class="flex"
-                             id="inputLocation"
-                             label="Location"
-                             always-float-label></paper-input>
+                <div class="layout horizontal">
+                    <paper-input value={{_customState.location}} class="flex" id="inputLocation" label="Location"
+                        always-float-label></paper-input>
+                    <paper-spinner id="locationSpinner"></paper-spinner>
+                    <paper-icon-button class="self-center" icon="maps:my-location" on-click="_locate">
+                    </paper-icon-button>
+                </div>
                 <div>Status</div>
-                <paper-radio-group class="layout vertical"
-                                   selected="{{_customState.status}}">
+                <paper-radio-group class="layout vertical" selected="{{_customState.status}}">
                     <paper-radio-button name="0">Anwesend</paper-radio-button>
                     <paper-radio-button name="1">Unterwegs</paper-radio-button>
                     <paper-radio-button name="2">Abwesend</paper-radio-button>
                     <paper-radio-button name="3">Telearbeit</paper-radio-button>
                 </paper-radio-group>
-                <vaadin-date-picker-light id="datePicker"
-                                          class="full-width"
-                                          attr-for-value="value"
-                                          i18n=[[i18nObject]]>
-                    <paper-input label="Gültig bis (einschließlich)"
-                                 value="{{_customState.until}}"
-                                 always-float-label>
+                <vaadin-date-picker-light id="datePicker" class="full-width" attr-for-value="value" i18n=[[i18nObject]]>
+                    <paper-input label="Gültig bis (einschließlich)" value="{{_customState.until}}" always-float-label>
                     </paper-input>
                 </vaadin-date-picker-light>
             </div>
             <div class="card-actions">
-                <paper-button class="anw-state foreground"
-                              state$="[[_customState.status]]"
-                              on-tap="_saveCustom">Speichern</paper-button>
+                <paper-button class="anw-state foreground" state$="[[_customState.status]]" on-tap="_saveCustom">
+                    Speichern</paper-button>
             </div>
         </paper-card>
 
@@ -162,6 +154,33 @@
 
                 this.set("_customState", {});
                 this.shadowRoot.querySelector('#datePicker').value = "";
+            }
+
+            _locate(e) {
+                var spinner = this.shadowRoot.querySelector('#locationSpinner');
+                if (navigator.geolocation) {
+                    spinner.active = true;
+                    navigator.geolocation.getCurrentPosition((position) => {
+                        {
+                            const locationAPIURL = `https://nominatim.openstreetmap.org/reverse?` +
+                        `format=json&` + 
+                        `lat=${position.coords.latitude}&` +
+                        `lon=${position.coords.longitude}`;
+                            fetch(locationAPIURL)
+                                .then((resp) => {
+                                    resp.json().then((data) => {
+                                        console.log("Location data: ", data);
+                                        var location = data.display_name.split(',');
+                                        this.shadowRoot.querySelector('#inputLocation').value = location.slice(0,3);
+                                    })
+                                })
+                                .catch((err) => console.error("Error fetching location:", err))
+                                .finally(() => spinner.active = false);
+                        }
+                    });
+                } else {
+                    //not supported
+                }
             }
 
         }
