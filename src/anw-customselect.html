@@ -170,7 +170,8 @@
                                 .then((resp) => {
                                     resp.json().then((data) => {
                                         console.log("Location data: ", data);
-                                        this.shadowRoot.querySelector('#inputLocation').value = data.display_name;
+                                        var location = data.display_name.split(',');
+                                        this.shadowRoot.querySelector('#inputLocation').value = location.slice(0,3);
                                     })
                                 })
                                 .catch((err) => console.error("Error fetching location:", err))
