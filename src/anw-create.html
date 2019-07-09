@@ -91,7 +91,6 @@
 
             static get properties() {
                 return {
-                    currentUser: Object,
                     _customState: {
                         type: Object,
                         value: {
@@ -126,8 +125,7 @@
                             1: "",
                             2: "",
                         },
-                        until: "",
-                        uid: this.user.uid
+                        until: ""
                     };
 
                     this.dispatchEvent(new CustomEvent('create', { detail: eventData }));

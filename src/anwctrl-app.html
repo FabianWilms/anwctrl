@@ -129,7 +129,7 @@
 
                     <div class="settings layout horizontal wrap center-justified">
                         <div class="setting">
-                            <anw-single person={{selectedAnwesenheit}}></anw-single>
+                            <anw-single user="{{user}}" person={{selectedAnwesenheit}}></anw-single>
                             <anw-quickselect on-klick="_updateStatus"></anw-quickselect>
                         </div>
                         <anw-customselect class="setting" on-save="_updateStatus"></anw-customselect>
@@ -140,7 +140,7 @@
                 </template>
                 <template is="dom-if" if="{{_checkNewUser(user, selectedAnwesenheit)}}">
                     <div class="settings layout horizontal wrap center-justified">
-                        <anw-create current-user="{{user}}" on-create="_saveNewPerson"></anw-create>
+                        <anw-create on-create="_saveNewPerson"></anw-create>
                     </div>
                 </template>
             </div>

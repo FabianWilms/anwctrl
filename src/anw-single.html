@@ -164,6 +164,7 @@
 
             static get properties() {
                 return {
+                    user: Object,
                     person: {
                         type: Object
                     },
@@ -217,7 +218,7 @@
                         return;
                     }
 
-                    storage.path = `/avatars/${this.person.uid}`;
+                    storage.path = `/avatars/${this.user.uid}`;
                     var uploadTask = storage.put(selectedFile);
 
                     uploadTask.on('state_changed',
