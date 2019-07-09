@@ -140,7 +140,7 @@
                 </template>
                 <template is="dom-if" if="{{_checkNewUser(user, selectedAnwesenheit)}}">
                     <div class="settings layout horizontal wrap center-justified">
-                        <anw-create on-create="_saveNewPerson"></anw-create>
+                        <anw-create current-user="{{user}}" on-create="_saveNewPerson"></anw-create>
                     </div>
                 </template>
             </div>
