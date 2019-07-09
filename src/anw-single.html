@@ -1,104 +1,275 @@
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
 <link rel="import" href="../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/paper-spinner/paper-spinner.html">
+<link rel="import" href="../bower_components/paper-toast/paper-toast.html">
+<link rel="import" href="../bower_components/paper-fab/paper-fab.html">
+<link rel="import" href="../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../bower_components/polymerfire/firebase-storage-ref.html">
 
 <link rel="import" href="https://raw.githubusercontent.com/FabianWilms/anwesenheit/master/styles/anw-style.html">
 
 <dom-module id="anw-single">
-  <template>
-    <style include="anw-style"></style>
-    <style include="iron-flex iron-flex-alignment"></style>
-    <style>
-      :host {
-        display: block;
-        max-width: var(--max-width);
-        width: 100%;
-      }
+    <template>
+        <style include="anw-style iron-flex iron-flex-alignment">
+            :host {
+                display: block;
+                max-width: var(--max-width);
+                width: 100%;
+            }
 
-      paper-card {
-        width: 100%;
-      }
+            paper-card {
+                width: 100%;
+            }
 
-      .card-header {
-        font-size: 32px;
-        padding: 12px 16px 8px 16px;
-      }
+            .card-header {
+                font-size: 32px;
+                padding: 12px 16px 8px 16px;
+            }
 
-      .card-content {
-        padding: 8px 16px 8px 16px;
-      }
+            .card-content {
+                padding: 8px 16px 8px 16px;
+            }
 
-      .img-circle {
-        border-radius: 50%;
-        width: 50px;
-      }
+            .img-circle {
+                border-radius: 50%;
+                width: 100px;
+                height: 100px;
+                filter: blur(0px) brightness(1);
+                transition: filter 0.3s;
+                object-fit: cover;
+            }
 
-      td.fieldname {
-        text-align: right;
-        padding-right: 10px;
-      }
-    </style>
+            td.fieldname {
+                text-align: right;
+                padding-right: 10px;
+            }
 
-    <paper-card class="anw-state background" state$="[[person.status]]">
-      <div class="layout horizontal center card-header">
-        <span class="flex">[[person.name]]</span>
-        <img src="[[person.avatar]]" class="img-circle"></img>
-      </div>
+            #avatarPicker {
+                position: absolute;
+                top: -1000rem;
+            }
 
-      <div class="card-content">
-        <table>
-          <tr>
-            <td class="fieldname">
-              <b>Status</b>
-            </td>
-            <td>[[person.status]]</td>
-          </tr>
-          <tr>
-            <td class="fieldname">
-              <b>Message</b>
-            </td>
-            <td>[[person.message]]</td>
-          </tr>
-          <tr>
-            <td class="fieldname">
-              <b>Location</b>
-            </td>
-            <td>[[person.location]]</td>
-          </tr>
-          <tr>
-            <td class="fieldname">
-              <b>Emoji</b>
-            </td>
-            <td>[[person.emoji]]</td>
-          </tr>
-          <tr>
-            <td class="fieldname">
-              <b>Abwesend bis</b>
-            </td>
-            <td>[[person.until]]</td>
-          </tr>
-        </table>
-      </div>
-    </paper-card>
-  </template>
+            paper-button {
+                font-size: 10px;
+                background: white;
+                margin-right: 16px;
+            }
 
-  <script>
-    /**
-     * @customElement
-     * @polymer
-     */
-    class AnwSingle extends Polymer.Element {
-      static get is() { return 'anw-single'; }
-      static get properties() {
-        return {
-          person: {
-            type: Object
-          }
-        };
-      }
+            paper-button > iron-icon {
+                padding-right: 8px;
+                height: 16px;
+                width: 16px;
+            }
 
-    }
+            paper-spinner {
+                pointer-events: none;
+                position: absolute;
+                z-index: 1;
+                top: 0;
+                width: 100px;
+                height: 100px;
 
-    window.customElements.define(AnwSingle.is, AnwSingle);
-  </script>
+                --paper-spinner-stroke-width: 5px;
+                --paper-spinner-layer-1-color: var(--anw-state-0);
+                --paper-spinner-layer-2-color: var(--anw-state-1);
+                --paper-spinner-layer-3-color: var(--anw-state-2);
+                --paper-spinner-layer-4-color: var(--anw-state-3);
+            }
+
+            paper-button.container {
+                position: relative;
+                width: fit-content;
+                background-color: transparent;
+                border-radius: 50%;
+            }
+
+            paper-fab {
+                display: block;
+                position: absolute;
+                cursor: pointer;
+                right: 0;
+                bottom: 0;
+                --paper-fab-background: white;
+                --paper-fab-keyboard-focus-background: white;
+                color: lightgray;
+                font-size: 15px;
+            }
+        </style>
+
+        <firebase-storage-ref id="storage">
+        </firebase-storage-ref>
+
+        <input id="avatarPicker" type="file" accept="image/*">
+        <paper-toast id="toast"></paper-toast>
+
+        <paper-card class="anw-state background" state$="[[person.status]]">
+            <div class="layout horizontal center card-header">
+                <span class="flex">[[person.name]]</span>
+                <paper-button noink class="container" on-tap="_uploadNewAvatar">
+                    <img src="[[person.avatar]]" class="img-circle"/>
+                    <paper-fab noink mini icon="icons:camera-enhance"></paper-fab>
+                    <paper-spinner></paper-spinner>
+                </paper-button>
+            </div>
+
+            <div class="card-content">
+                <table>
+                    <tr>
+                        <td class="fieldname">
+                            <b>Status</b>
+                        </td>
+                        <td>[[person.status]]</td>
+                    </tr>
+                    <tr>
+                        <td class="fieldname">
+                            <b>Message</b>
+                        </td>
+                        <td>[[person.message]]</td>
+                    </tr>
+                    <tr>
+                        <td class="fieldname">
+                            <b>Location</b>
+                        </td>
+                        <td>[[person.location]]</td>
+                    </tr>
+                    <tr>
+                        <td class="fieldname">
+                            <b>Emoji</b>
+                        </td>
+                        <td>[[person.emoji]]</td>
+                    </tr>
+                    <tr>
+                        <td class="fieldname">
+                            <b>Abwesend bis</b>
+                        </td>
+                        <td>[[person.until]]</td>
+                    </tr>
+                </table>
+            </div>
+        </paper-card>
+    </template>
+
+    <script>
+        /**
+         * @customElement
+         * @polymer
+         */
+        class AnwSingle extends Polymer.Element {
+            static get is() {
+                return 'anw-single';
+            }
+
+            static get properties() {
+                return {
+                    person: {
+                        type: Object
+                    },
+                    profilePointer: {
+                        type: Object,
+                        observer: "_uploadNewAvatar"
+                    }
+                };
+            }
+
+            ready() {
+                super.ready();
+
+                var fileInput = this.shadowRoot.querySelector('#avatarPicker');
+                fileInput.addEventListener('change', e => this.saveProfileImage(e));
+            }
+
+            saveProfileImage(e) {
+                var toast = this.shadowRoot.querySelector('#toast');
+                var spinner = this.shadowRoot.querySelector('paper-spinner');
+                var storage = this.shadowRoot.querySelector('#storage');
+
+                var selectedFiles = e.target.files;
+                if (selectedFiles.length === 0) {
+                    toast.text = "Du hast kein Bild ausgewählt.";
+                    toast.show();
+                    console.warn("no file selected");
+
+                } else {
+                    spinner.active = true;
+                    const selectedFile = selectedFiles[0];
+
+                    console.log("selected file: ", {
+                        name: selectedFile.name,
+                        size: selectedFile.size,
+                        type: selectedFile.type
+                    });
+
+                    // Maximal 1000000 byte == 1MB
+                    if (selectedFile.size > 1000000) {
+                        toast.text = "Die maximale Dateigröße beträgt 1MB. Bitte wähle ein anderes Bild aus.";
+                        toast.show();
+                        spinner.active = false;
+                        return;
+                    }
+
+                    if (!selectedFile.type.startsWith("image/")) {
+                        toast.text = `Dateien vom Typ ${selectedFile.type} sind nicht erlaubt.`;
+                        toast.show();
+                        spinner.active = false;
+                        return;
+                    }
+
+                    storage.path = `/avatars/${this.person.uid}`;
+                    var uploadTask = storage.put(selectedFile);
+
+                    uploadTask.on('state_changed',
+                        (snapshot) => {
+                            // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+                            var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                            console.log('Upload is ' + progress + '% done');
+                            switch (snapshot.state) {
+                                case 'paused':
+                                    console.log('Upload is paused');
+                                    break;
+                                case 'running':
+                                    console.log('Upload is running');
+                                    break;
+                            }
+                        },
+                        (error) => {
+                            switch (error.code) {
+                                case 'storage/unauthorized':
+                                    // User doesn't have permission to access the object
+                                    console.error('You dont have permission to access object');
+                                    break;
+
+                                case 'storage/canceled':
+                                    // User canceled the upload
+                                    console.error('User cancelled upload');
+                                    break;
+
+                                case 'storage/unknown':
+                                    // Unknown error occurred, inspect error.serverResponse
+                                    console.error(error.code);
+                                    break;
+                            }
+                            spinner.active = false;
+                        },
+                        () => {
+                            // Upload completed successfully, now we can get the download URL
+                            var downloadURL = uploadTask.snapshot.downloadURL;
+                            this.set('person.avatar', downloadURL);
+                            toast.text = "Neuer Avatar wurde erfolgreich hochgeladen.";
+                            toast.open();
+                            spinner.active = false;
+                        });
+                }
+            }
+
+            _uploadNewAvatar(e) {
+                this.shadowRoot.querySelector('#avatarPicker').click();
+            }
+
+        }
+
+        window.customElements.define(AnwSingle.is, AnwSingle);
+    </script>
 </dom-module>

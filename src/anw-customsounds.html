@@ -1,0 +1,90 @@
+<link rel="import"
+      href="../bower_components/polymer/polymer-element.html">
+<link rel="import"
+      href="../bower_components/paper-card/paper-card.html">
+<link rel="import"
+      href="../bower_components/paper-button/paper-button.html">
+<link rel="import"
+        href="../bower_components/paper-input/paper-input.html">
+<link rel="import"
+      href="../bower_components/app-layout/app-layout.html">
+
+<link rel="import"
+      href="https://raw.githubusercontent.com/FabianWilms/anwesenheit/master/styles/anw-style.html">
+
+<dom-module id="anw-customsounds">
+    <template>
+        <style include="anw-style"></style>
+        <style include="iron-flex iron-flex-alignment"></style>
+        <style>
+            :host {
+                display: block;
+                max-width: var(--max-width);
+                width: 100%;
+            }
+
+            paper-card {
+                width: 100%;
+                background: white;
+                --paper-card-actions: {
+                    border-top: 1px solid #fafafa;
+                }
+            }
+
+            paper-button {
+                margin: 8px;
+            }
+
+        </style>
+
+        <paper-card>
+            <div class="card-content">
+                <div>Sounds</div>
+                <paper-input value={{sounds.0}}
+                             required
+                             auto-validate
+                             class="flex"
+                             id="inputSound"
+                             label="Sound Status: Anwesend"
+                             always-float-label></paper-input>
+                <paper-input value={{sounds.1}}
+                             required
+                             auto-validate
+                             class="flex"
+                             id="inputSound"
+                             label="Sound Status: Unterwegs"
+                             always-float-label></paper-input>
+                <paper-input value={{sounds.2}}
+                             required
+                             auto-validate
+                             class="flex"
+                             id="inputSound"
+                             label="Sound Status: Abwesend"
+                             always-float-label></paper-input>
+            </div>
+        </paper-card>
+
+
+    </template>
+
+    <script>
+
+        class AnwCustomSoundsselect extends Polymer.Element {
+
+            static get is() {
+                return 'anw-customsounds';
+            }
+
+            static get properties() {
+                return {
+                    sounds: {
+                        type: Array,
+                        notify: true
+                    }
+                };
+            }
+        }
+
+        window.customElements.define(AnwCustomSoundsselect.is, AnwCustomSoundsselect);
+    </script>
+</dom-module>
