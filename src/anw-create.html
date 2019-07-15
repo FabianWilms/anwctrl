@@ -61,16 +61,9 @@
                                          auto-validate
                                          class="flex"
                                          id="inputName"
-                                         label="Name"
+                                         label="Anzeigename"
                                          always-float-label></paper-input>
                         </div>
-                        <paper-input value={{_customState.avatar}}
-                                     required
-                                     auto-validate
-                                     class="flex"
-                                     id="inputAvatar"
-                                     label="Avatar-Link"
-                                     always-float-label></paper-input>
                     </form>
                 </iron-form>
             </div>
@@ -104,12 +97,12 @@
                 if(this.$.personForm.validate()) {
                     var eventData = {
                         name: this._customState.name,
-                        avatar: this._customState.avatar,
+                        avatar: "https://fabianwilms.github.io/anwesenheit/images/touch/ms-icon-310x310.png",
                         status: 0,
                         emoji: "",
                         key: this._customState.name.toLowerCase(),
                         location: "",
-                        message: "Booting...",
+                        message: "I'm new - please help!",
                         pushnotifier: {
                             apptoken: "ASK AN ADMIN!"
                         },
