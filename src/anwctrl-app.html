@@ -2,6 +2,7 @@
 <link rel="import" href="../bower_components/paper-styles/default-theme.html">
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../bower_components/iron-icons/social-icons.html">
 <link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
 <link rel="import" href="../bower_components/paper-tabs/paper-tab.html">
 <link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
@@ -39,17 +40,8 @@
                 margin-bottom: 32px;
             }
 
-            paper-tabs {
-                --paper-tabs-selection-bar-color: #fff;
-                --paper-tab-ink: #fff;
-                --paper-tabs: {
-                    background-color: #448aff;
-                    color: #fff;
-                }
-            }
-
             app-toolbar {
-                background-color: #448aff;
+                background-color: var(--primary-color);
                 color: white;
             }
 
@@ -107,9 +99,10 @@
                 </template>
 
                 <template is="dom-if" if="{{selectedAnwesenheit.name}}">
-                    <paper-icon-button id="shareBtn" icon="icons:launch" on-tap="_openShareDialog"></paper-icon-button>
+                    <paper-icon-button icon="social:share" on-tap="_openShareDialog"></paper-icon-button>
                     <anw-subscriptions subscriptions="[[selectedAnwesenheit.subscriptions]]"></anw-subscriptions>
                     <paper-icon-button id="btn" icon="{{_getIcon(notifies.length)}}" on-tap="_toggleDrawer"></paper-icon-button>
+                    <paper-icon-button icon="lock-outline" on-tap="_logout"></paper-icon-button>
                 </template>
 
             </app-toolbar>
@@ -120,10 +113,10 @@
             <anw-notifications on-delete="_delete" notifies={{notifies}}></anw-notifications>
         </app-drawer>
 
+        <auth-element user={{user}}></auth-element>
+        
         <div class="layout horizontal">
             <div class="layout vertical main-content">
-
-                <auth-element user={{user}}></auth-element>
 
                 <template is="dom-if" if="{{selectedAnwesenheit.key}}">
 
@@ -221,6 +214,10 @@
                 } else {
                     return "anwctrl:number-more";
                 }
+            }
+
+            _logout(e) {
+                this.shadowRoot.querySelector('auth-element').logout();
             }
         }
 

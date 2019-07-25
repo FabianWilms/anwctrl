@@ -1,53 +1,98 @@
-<link rel="import"
-      href="../bower_components/polymer/polymer-element.html">
-<link rel="import"
-      href="../bower_components/polymerfire/firebase-auth.html">
-<link rel="import"
-      href="../bower_components/paper-icon-button/paper-icon-button.html">
-<link rel="import"
-      href="../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/polymerfire/firebase-auth.html">
+<link rel="import" href="../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../bower_components/paper-toast/paper-toast.html">
+<link rel="import" href="../bower_components/paper-toggle-button/paper-toggle-button.html">
+<link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 
 <dom-module id="auth-element">
     <template>
         <style include="iron-flex iron-flex-alignment"></style>
         <style>
             :host {
-                display: block
+                display: block;
             }
 
             h1 {
                 text-align: center;
             }
 
-            paper-icon-button {
-                height: 94px;
-                width: 94px;
-                margin: 16px;
+            paper-card {
+                margin-top: 96px;
+                max-width: 350px;
+
+                --paper-card-header-image: {
+                    max-height: 160px;
+                }
+
+                --paper-card-header-text: {
+                    width: 100%;
+                    background: linear-gradient(to bottom, rgba(250, 250, 250, 0) 0%, rgba(250, 250, 250, 1) 100%);
+                }
+            }
+
+            .toggle {
+                font-size: 14px;
+            }
+
+            paper-toggle-button {
+                padding-left: 8px;
+            }
+
+            paper-button iron-icon {
+                padding-right: 8px;
+            }
+
+            .form {
+                padding: 16px;
+            }
+
+            .forgot-password {
+                padding-top: 16px;
+                font-size: 12px;
+            }
+
+            .forgot-password>span {
+                text-decoration: underline;
+                cursor: pointer;
+                color: blue;
             }
         </style>
 
-        <firebase-auth id="auth"
-                       user="{{user}}"
-                       on-error="_errorHandler"></firebase-auth>
+        <firebase-auth id="auth" user="{{user}}" on-error="_errorHandler"></firebase-auth>
 
-        <template is="dom-if"
-                  if="{{!user}}">
+        <paper-toast id="toast"></paper-toast>
+
+        <template is="dom-if" if="{{!user}}">
             <div class="layout vertical center-justified">
-
-                <h1>Bitte wähle einen Login-Provider deiner Wahl</h1>
-
                 <div class="layout horizontal center-justified">
-                    <paper-icon-button src="https://fabianwilms.github.io/anwctrl/images/touch/github_logo.png"
-                                       on-tap="_loginGithub"
-                                       title="Login mit Github"
-                                       raised>
-                    </paper-icon-button>
-                    <paper-icon-button src="https://fabianwilms.github.io/anwctrl/images/touch/google_logo.png"
-                                       on-tap="_loginGoogle"
-                                       title="Login mit Google"
-                                       raised>
-                    </paper-icon-button>
-                    </paper-icon-button>
+                    <paper-card heading="ANW-CTRL Login"
+                        image="../images/desk.jpg"
+                        preload-image fade-image>
+                        <div class="layout vertical center-justified form">
+                            <div class="layout horizontal self-center toggle">
+                                <span>Registrieren</span>
+                                <paper-toggle-button checked="{{isAnmeldung}}" class=self-center></paper-toggle-button>
+                                <span>Anmelden</span>
+                            </div>
+
+                            <paper-input id="mail" label="E-Mail" type="email" name="email" autocomplete="email" auto-validate></paper-input>
+                            <paper-input id="pass" label="Passwort" type="password" name="password" autocomplete="password" minlength="3"
+                                auto-validate>
+                            </paper-input>
+
+                            <div class="layout horizontal">
+                                <span class="flex"></span>
+                                <paper-button on-click="_doMagic" type="submit">
+                                    <iron-icon icon="[[_getIcon(isAnmeldung)]]"></iron-icon>
+                                    [[_getText(isAnmeldung)]]
+                                </paper-button>
+                            </div>
+                            <div class="self-center forgot-password">Passwort vergessen? <span on-click="_sendForgotPWMail">Hier</span> klicken zum
+                                zurücksetzen.
+                            </div>
+                        </div>
+                    </paper-card>
                 </div>
             </div>
         </template>
@@ -71,32 +116,75 @@
                     user: {
                         type: Object,
                         notify: true
+                    },
+                    isAnmeldung: {
+                        type: Boolean,
+                        value: true
                     }
                 };
             }
 
-            _loginGithub() {
-                this.$.auth.signInWithRedirect("github")
-                    .then(function (response) {
-                        this._errorHandler(response);
+            logout() {
+                this.$.auth.signOut()
+                    .then((resp) => {
+                        console.log(resp);
                     })
-                    .catch(function (error) {
-                        this._errorHandler(error);
-                    });
+                    .catch((err) => this._errorHandler(err, "Logout fehlgeschlagen."));
             }
 
-            _loginGoogle() {
-                this.$.auth.signInWithRedirect("google")
-                    .then(function (response) {
-                        this._errorHandler(response);
-                    })
-                    .catch(function (error) {
-                        this._errorHandler(error);
-                    });
+            _doMagic(e) {
+                var mailInput = this.shadowRoot.querySelector('#mail');
+                var passInput = this.shadowRoot.querySelector('#pass');
+
+                if (this.isAnmeldung) {
+                    this._login(mailInput.value, passInput.value);
+                } else {
+                    this._register(mailInput.value, passInput.value);
+                }
             }
 
-            _errorHandler(error) {
-                console.log(error);
+            _login(email, password) {
+                this.$.auth.signInWithEmailAndPassword(email, password)
+                    .then((resp) => {
+                        console.log(resp);
+                        this._showToast(`Willkommen, ${resp.email}.`);
+                    })
+                    .catch((err) => this._errorHandler(err, err.detail.message));
+            }
+
+            _register(email, password) {
+                this.$.auth.createUserWithEmailAndPassword(email, password)
+                    .then((resp) => {
+                        console.log(resp);
+                    })
+                    .catch((err) => this._errorHandler(err, err.detail.message));
+            }
+
+            _sendForgotPWMail(email) {
+                var email = window.prompt("Mail-Adresse eingeben:");
+                this.$.auth.sendPasswordResetEmail(email)
+                    .then((resp) => {
+                        this._showToast("Passwort wurde zurückgesetzt. Schau in dein Postfach!");
+                    })
+                    .catch((err) => this._errorHandler(err, err.detail.message));
+            }
+
+            _errorHandler(error, message) {
+                console.error(error);
+                this._showToast(message);
+            }
+
+            _showToast(message) {
+                this.$.toast.text = message;
+                this.$.toast.show();
+            }
+
+            _getText(isAnmeldung) {
+                return isAnmeldung ? "Anmelden" : "Registrieren";
+            }
+
+            _getIcon(isAnmeldung) {
+                return isAnmeldung ? "lock-open" : "social:person-add"
             }
         }
 
