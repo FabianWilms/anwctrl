@@ -105,22 +105,29 @@
 
                                     // Wenn Benachrichtigung noch nicht bereits angezeigt wurde...
                                     if (!notifiedStorage.getItem(key)) {
-                                        var author = newNotifications[key].details ? newNotifications[key].details.author : undefined;
-                                        var message = "";
+                                        const author = newNotifications[key].details ? newNotifications[key].details.author : undefined;
+                                        var title = "";
 
                                         if (author) {
-                                            message = `Neue Nachricht von "${author}".`;
+                                            title = `Neue Nachricht von "${author}".`;
                                         } else {
-                                            message = "Neue Nachricht erhalten."
+                                            title = "Neue Nachricht erhalten."
                                         }
 
-                                        registration.showNotification(message,
+                                        var browserNotification = new Notification(title,
                                             {
+                                                tag: key,
+                                                action: "action",
+                                                title: "title",
+                                                body: newNotifications[key].message,
+                                                lang: "de-DE",
+                                                timestamp: newNotifications[key].date,
                                                 icon: "https://fabianwilms.github.io/anwctrl/images/touch/android-icon-192x192.png",
                                                 body: AnwNotifications._toDateString(newNotifications[key].date),
                                                 badge: "https://fabianwilms.github.io/anwctrl/images/touch/notification.png",
                                                 vibrate: [300, 100, 300]
                                             });
+
                                         // Als "Benachrichtigt" markiert
                                         notifiedStorage.setItem(key, newNotifications[key])
                                     }
