@@ -40,6 +40,27 @@
   <meta name="msapplication-TileImage" content="images/touch/ms-icon-144x144-precomposed.png">
 
   <script>
+    self.addEventListener('notificationclick', function (event) {
+      console.log('On notification click: ', event.notification.tag);
+      event.notification.close();
+
+      // This looks to see if the current is already open and
+      // focuses if it is
+      event.waitUntil(clients.matchAll({
+        type: "window"
+      }).then(function (clientList) {
+        for (var i = 0; i < clientList.length; i++) {
+          var client = clientList[i];
+          if (client.url == '/' && 'focus' in client)
+            return client.focus();
+        }
+        if (clients.openWindow)
+          return clients.openWindow('/');
+      }));
+    });
+  </script>
+
+  <script>
     Sentry.init({ dsn: 'https://2d0c660399524b4d9a48294f36e33334@sentry.io/1287731' });
   </script>
 </head>
