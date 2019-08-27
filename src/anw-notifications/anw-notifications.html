@@ -130,6 +130,12 @@
                     });
 
                     this.lastNObj = newNObj;
+                } else {
+                    // Wenn eine Benachrichtigung gelöscht wird,
+                    // muss auch this.lastNObj entsprechend angepasst werden
+                    // für zukünftige Vergleiche
+                    var newNObj = this._arrayToObject(newNData);
+                    this.lastNObj = newNObj;
                 }
             }
 
