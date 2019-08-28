@@ -94,45 +94,49 @@
                     var newNObj = this._arrayToObject(newNData);
                     var newNotifications = this._getDiff(newNObj, this.lastNObj);
 
-                    Notification.requestPermission(function (result) {
-                        if (result === 'granted') {
+                    if ("Notification" in window) {
+                        Notification.requestPermission(function (result) {
+                            if (result === 'granted') {
 
-                            // Zum speichern, ob eine Benachrichtigung bereits angezeigt wurde
-                            let notifiedStorage = window.localStorage;
+                                // Zum speichern, ob eine Benachrichtigung bereits angezeigt wurde
+                                let notifiedStorage = window.localStorage;
 
-                            navigator.serviceWorker.ready.then(function (registration) {
-                                for (var key in newNotifications) {
+                                navigator.serviceWorker.ready.then(function (registration) {
+                                    for (var key in newNotifications) {
 
-                                    // Wenn Benachrichtigung noch nicht bereits angezeigt wurde...
-                                    if (!notifiedStorage.getItem(key)) {
-                                        const author = newNotifications[key].details ? newNotifications[key].details.author : undefined;
-                                        var title = "";
+                                        // Wenn Benachrichtigung noch nicht bereits angezeigt wurde...
+                                        if (!notifiedStorage.getItem(key)) {
+                                            const author = newNotifications[key].details ? newNotifications[key].details.author : undefined;
+                                            var title = "";
 
-                                        if (author) {
-                                            title = `Neue Nachricht von "${author}".`;
-                                        } else {
-                                            title = "Neue Nachricht erhalten."
+                                            if (author) {
+                                                title = `Neue Nachricht von "${author}".`;
+                                            } else {
+                                                title = "Neue Nachricht erhalten."
+                                            }
+
+                                            registration.showNotification(title,
+                                                {
+                                                    tag: key,
+                                                    body: newNotifications[key].message,
+                                                    lang: "de-DE",
+                                                    timestamp: newNotifications[key].date,
+                                                    icon: "https://fabianwilms.github.io/anwctrl/images/touch/android-icon-192x192.png",
+                                                    body: AnwNotifications._toDateString(newNotifications[key].date),
+                                                    badge: "https://fabianwilms.github.io/anwctrl/images/touch/notification.png",
+                                                    vibrate: [300, 100, 300]
+                                                });
+
+                                            // Als "Benachrichtigt" markiert
+                                            notifiedStorage.setItem(key, newNotifications[key])
                                         }
-
-                                        registration.showNotification(title,
-                                            {
-                                                tag: key,
-                                                body: newNotifications[key].message,
-                                                lang: "de-DE",
-                                                timestamp: newNotifications[key].date,
-                                                icon: "https://fabianwilms.github.io/anwctrl/images/touch/android-icon-192x192.png",
-                                                body: AnwNotifications._toDateString(newNotifications[key].date),
-                                                badge: "https://fabianwilms.github.io/anwctrl/images/touch/notification.png",
-                                                vibrate: [300, 100, 300]
-                                            });
-
-                                        // Als "Benachrichtigt" markiert
-                                        notifiedStorage.setItem(key, newNotifications[key])
                                     }
-                                }
-                            });
-                        }
-                    });
+                                });
+                            }
+                        });
+                    } else {
+                        console.warn("Notifications not available on this browser...");
+                    }
 
                     this.lastNObj = newNObj;
                 } else {
