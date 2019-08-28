@@ -2,6 +2,7 @@
   "builds": [
     {
       "preset": "es5-bundled",
+      "addServiceWorker": false,  
       "basePath": "/anwctrl/"
     }
   ],
@@ -10,7 +11,10 @@
     "src/**/*",
     "images/**/*",
     "bower.json"
-   ],
+  ],
+  "extraDependencies": [
+    "service-worker.js"
+  ],
   "lint": {
     "rules": [
       "polymer-2"
